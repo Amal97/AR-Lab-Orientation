@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "492874800904",
+    "firebase_url": "https://lab-orientation.firebaseio.com",
+    "project_id": "lab-orientation",
+    "storage_bucket": "lab-orientation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492874800904:android:b9d5d1e3a82aed11",
+        "android_client_info": {
+          "package_name": "com.project.laborientation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "492874800904-b3ssbt3nsharlg8jacrkc76tocq27o8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAasBs-oKNGTAnxLnQjAeoQrbv4audC8j4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "492874800904-b3ssbt3nsharlg8jacrkc76tocq27o8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
