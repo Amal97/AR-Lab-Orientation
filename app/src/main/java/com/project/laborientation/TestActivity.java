@@ -3,6 +3,7 @@ package com.project.laborientation;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -47,6 +48,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import com.project.laborientation.GraphicOverlay;
+
+
 
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
@@ -71,10 +75,17 @@ public class TestActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Image image;
+    private GraphicOverlay mGraphicOverlay;
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+        mGraphicOverlay = findViewById(R.id.graphic_overlay);
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
@@ -328,10 +339,29 @@ public class TestActivity extends AppCompatActivity {
             Toast.makeText(TestActivity.this, "No Text :(", Toast.LENGTH_LONG).show();
             return;
         }
-        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
-            String txt = block.getText();
-            Toast.makeText(TestActivity.this, txt, Toast.LENGTH_LONG).show();
+        mGraphicOverlay.clear();
+        for (int i = 0; i < blocks.size(); i++) {
+            List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
+            for (int j = 0; j < lines.size(); j++) {
+                GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, lines.get(j));
+                mGraphicOverlay.add(textGraphic);
+            }
+       //     for (int j = 0; j < lines.size(); j++) {
+//                List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
+//                for (int k = 0; k < elements.size(); k++) {
+//                    GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+//                    mGraphicOverlay.add(textGraphic);
+//
+//                }
+//            }
         }
+
+
+//        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
+//            String txt = block.getText();
+//            block.getBoundingBox();
+//            Toast.makeText(TestActivity.this, txt, Toast.LENGTH_LONG).show();
+//        }
     }
 
     /**
