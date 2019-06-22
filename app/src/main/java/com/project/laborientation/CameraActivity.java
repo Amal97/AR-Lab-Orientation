@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -23,10 +21,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -36,6 +30,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -43,14 +42,12 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestActivity extends AppCompatActivity {
-    private static final String TAG = "TestActivity";
-    private Button takePictureButton;
+public class CameraActivity extends AppCompatActivity {
+    private static final String TAG = "CameraActivity";
     private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
@@ -62,19 +59,20 @@ public class TestActivity extends AppCompatActivity {
     private String cameraId;
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
-    protected CaptureRequest captureRequest;
     protected CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
     private ImageReader imageReader;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private boolean mFlashSupported;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Image image;
+
+    //TODO: Consider flash + focus
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Button takePictureButton;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_camera);
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
@@ -152,6 +150,7 @@ public class TestActivity extends AppCompatActivity {
         }
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
+            //TODO: See what this can return if it cannot return null?
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
             if (characteristics != null) {
@@ -183,7 +182,7 @@ public class TestActivity extends AppCompatActivity {
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     try {
-                        int rotation = getRotationCompensation(cameraId, TestActivity.this, getApplicationContext());
+                        int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
                         detectText(image, rotation);
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
@@ -229,13 +228,14 @@ public class TestActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(TestActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
                 }
             }, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+
     private void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.e(TAG, "is camera open");
@@ -247,7 +247,7 @@ public class TestActivity extends AppCompatActivity {
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             // Add permission for camera and let user grant the permission
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(TestActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+                ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
             manager.openCamera(cameraId, stateCallback, null);
@@ -268,21 +268,22 @@ public class TestActivity extends AppCompatActivity {
         }
     }
     private void closeCamera() {
-        if (null != cameraDevice) {
+        if (cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
         }
-        if (null != imageReader) {
+        if (imageReader != null) {
             imageReader.close();
             imageReader = null;
         }
     }
+
+    //TODO: See if you can request camera permission outside of this activity? Would simplify if can do it in main activity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                // close the app
-                Toast.makeText(TestActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this, "Sorry! We nee", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -300,10 +301,10 @@ public class TestActivity extends AppCompatActivity {
     }
     @Override
     protected void onPause() {
-        Log.e(TAG, "onPause");
-        //closeCamera();
-        stopBackgroundThread();
         super.onPause();
+        Log.e(TAG, "onPause");
+        closeCamera();
+        stopBackgroundThread();
     }
 
     private void detectText(Image image, int rotation) {
@@ -325,12 +326,12 @@ public class TestActivity extends AppCompatActivity {
     private void processTxt(FirebaseVisionText text) {
         List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
         if (blocks.size() == 0) {
-            Toast.makeText(TestActivity.this, "No Text :(", Toast.LENGTH_LONG).show();
+            Toast.makeText(CameraActivity.this, "No Text :(", Toast.LENGTH_LONG).show();
             return;
         }
         for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
             String txt = block.getText();
-            Toast.makeText(TestActivity.this, txt, Toast.LENGTH_LONG).show();
+            Toast.makeText(CameraActivity.this, txt, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -340,7 +341,8 @@ public class TestActivity extends AppCompatActivity {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private int getRotationCompensation(String cameraId, Activity activity, Context context)
-            throws CameraAccessException {
+            throws CameraAccessException{
+        int result;
         // Get the device's current rotation relative to its "native" orientation.
         // Then, from the ORIENTATIONS table, look up the angle the image must be
         // rotated to compensate for the device's rotation.
@@ -357,7 +359,6 @@ public class TestActivity extends AppCompatActivity {
         rotationCompensation = (rotationCompensation + sensorOrientation + 270) % 360;
 
         // Return the corresponding FirebaseVisionImageMetadata rotation value.
-        int result;
         switch (rotationCompensation) {
             case 0:
                 result = FirebaseVisionImageMetadata.ROTATION_0;
