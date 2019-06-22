@@ -40,6 +40,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
+import com.google.firebase.ml.vision.objects.FirebaseVisionObject;
+import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector;
+import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import java.util.ArrayList;
@@ -183,7 +188,9 @@ public class CameraActivity extends AppCompatActivity {
                     super.onCaptureCompleted(session, request, result);
                     try {
                         int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
-                        detectText(image, rotation);
+                        FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
+                        labelObject(firebaseImage);
+                        // detectText(firebaseImage);
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
                     }
@@ -283,7 +290,7 @@ public class CameraActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(CameraActivity.this, "Sorry! We nee", Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this, "Camera Permission is needed to continue", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -307,10 +314,30 @@ public class CameraActivity extends AppCompatActivity {
         stopBackgroundThread();
     }
 
-    private void detectText(Image image, int rotation) {
-        FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
+    private void labelObject(FirebaseVisionImage image) {
+        FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
+                .getOnDeviceImageLabeler();
+        labeler.processImage(image)
+                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                    @Override
+                    public void onSuccess(List<FirebaseVisionImageLabel> labels) {
+                        for (FirebaseVisionImageLabel label: labels) {
+                            String text = label.getText();
+                            Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    private void detectText(FirebaseVisionImage image) {
         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-        detector.processImage(firebaseImage).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+        detector.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
                 processTxt(firebaseVisionText);
