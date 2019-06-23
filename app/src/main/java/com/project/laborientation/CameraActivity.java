@@ -37,14 +37,14 @@ import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
+import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
-import com.google.firebase.ml.vision.objects.FirebaseVisionObject;
-import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector;
-import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions;
+import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import java.util.ArrayList;
@@ -87,6 +87,8 @@ public class CameraActivity extends AppCompatActivity {
                 takePicture();
             }
         });
+
+
     }
     //This listener responds to events related to the listener
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -145,7 +147,7 @@ public class CameraActivity extends AppCompatActivity {
             mBackgroundThread = null;
             mBackgroundHandler = null;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
     protected void takePicture() {
@@ -192,7 +194,7 @@ public class CameraActivity extends AppCompatActivity {
                         labelObject(firebaseImage);
                         // detectText(firebaseImage);
                     } catch (CameraAccessException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, e.getMessage());
                     }
                     createCameraPreview();
                 }
@@ -203,7 +205,7 @@ public class CameraActivity extends AppCompatActivity {
                     try {
                         session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
                     } catch (CameraAccessException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, e.getMessage());
                     }
                 }
                 @Override
@@ -211,7 +213,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
     protected void createCameraPreview() {
@@ -239,7 +241,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
             }, null);
         } catch (CameraAccessException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
 
@@ -259,7 +261,7 @@ public class CameraActivity extends AppCompatActivity {
             }
             manager.openCamera(cameraId, stateCallback, null);
         } catch (CameraAccessException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         Log.e(TAG, "openCamera X");
     }
@@ -271,7 +273,7 @@ public class CameraActivity extends AppCompatActivity {
         try {
             cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
     private void closeCamera() {
@@ -315,24 +317,42 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void labelObject(FirebaseVisionImage image) {
-        FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
-                .getOnDeviceImageLabeler();
-        labeler.processImage(image)
-                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
-                    @Override
-                    public void onSuccess(List<FirebaseVisionImageLabel> labels) {
-                        for (FirebaseVisionImageLabel label: labels) {
-                            String text = label.getText();
-                            Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
+        FirebaseLocalModel localModel = new FirebaseLocalModel.Builder("oscilloscope_model")
+                .setAssetFilePath("data/manifest.json")
+                .build();
+        FirebaseModelManager.getInstance().registerLocalModel(localModel);
+        FirebaseVisionOnDeviceAutoMLImageLabelerOptions labelerOptions =
+                new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
+                        .setLocalModelName("oscilloscope_model")
+                        .setConfidenceThreshold(0)  // Evaluate your model in the Firebase console
+                        .build();
+        try {
+            FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
+                    .getOnDeviceAutoMLImageLabeler(labelerOptions);
+
+            labeler.processImage(image)
+                    .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                        @Override
+                        public void onSuccess(List<FirebaseVisionImageLabel> labels) {
+                            float confidenceLevel = 0;
+                            for (FirebaseVisionImageLabel label : labels) {
+                                if (label.getConfidence() >= confidenceLevel) {
+                                    confidenceLevel = label.getConfidence();
+                                    String text = label.getText();
+                                    Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
+                                }
+                            }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
     private void detectText(FirebaseVisionImage image) {
