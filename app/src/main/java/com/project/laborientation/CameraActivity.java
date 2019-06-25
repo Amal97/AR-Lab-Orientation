@@ -334,13 +334,10 @@ public class CameraActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
                         @Override
                         public void onSuccess(List<FirebaseVisionImageLabel> labels) {
-                            float confidenceLevel = 0;
                             for (FirebaseVisionImageLabel label : labels) {
-                                if (label.getConfidence() >= confidenceLevel) {
-                                    confidenceLevel = label.getConfidence();
                                     String text = label.getText();
                                     Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
-                                }
+                                    Toast.makeText(CameraActivity.this, Float.toString(label.getConfidence()), Toast.LENGTH_LONG).show();
                             }
                         }
                     })

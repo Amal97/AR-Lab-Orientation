@@ -3,4 +3,7 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_lab_rules">LabRules</string>
     <string name="take_picture">Take a photo</string>
+    <string name="facebook_application_id" translatable="false">1273685149473684</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb1273685149473684</string>
+
 </resources>
