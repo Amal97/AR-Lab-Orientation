@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         button_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent cameraIntent = new Intent(getBaseContext(), CameraActivity.class);
+                Intent cameraIntent = new Intent(getBaseContext(), MainCameraActivity.class);
                 startActivityForResult(cameraIntent, 1);
              //   startActivity(cameraIntent);
             }
@@ -67,11 +67,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-
-        int score = data.getIntExtra(CameraActivity.PASS_EXTRA_SCORE, 0);
-        textViewHighscore.setText(Integer.toString(score));
         if(requestCode == REQUEST_CODE_QUIZ){
             if(resultCode == RESULT_OK){
+                int score = data.getIntExtra(MainCameraActivity.PASS_EXTRA_SCORE, 0);
+                textViewHighscore.setText(Integer.toString(score));
                 if(score > highscore){
                     updateHighscore(score);
                 }
