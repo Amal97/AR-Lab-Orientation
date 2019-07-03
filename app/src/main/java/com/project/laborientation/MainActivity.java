@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // DONT NEED THIS ANYMORE I THINK
     private void loadCategories(){
         QuizDbHelper dbHelper = QuizDbHelper.getInstance(this);
         List<Category> categories = dbHelper.getAllCategories();

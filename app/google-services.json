@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "492874800904-c7tlq3pbksrq4tsrbmn5obhg8am2fu99.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.laborientation",
+            "certificate_hash": "6241ccf38c7faf760211d09fbedceaff2793cf5d"
+          }
+        },
+        {
+          "client_id": "492874800904-7q7lnv7656jreri5vluaafio9umg7k3r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.laborientation",
+            "certificate_hash": "f18984206489856c8c3b651f67e0e85901cd0359"
+          }
+        },
+        {
+          "client_id": "492874800904-li3vmncmmn21d06dfmkv3tn4tl7aqlbk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.laborientation",
+            "certificate_hash": "33933d44b64749158f0a59f1496ec54e8d462ff6"
+          }
+        },
+        {
           "client_id": "492874800904-b3ssbt3nsharlg8jacrkc76tocq27o8t.apps.googleusercontent.com",
           "client_type": 3
         }

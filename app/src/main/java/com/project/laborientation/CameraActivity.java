@@ -22,6 +22,9 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -38,11 +41,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
-
+import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.common.FirebaseMLException;
-import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -50,7 +52,6 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
-import com.project.laborientation.Quiz.Category;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,24 +87,21 @@ public class CameraActivity extends AppCompatActivity {
     private int highscore = 0;
     Button takePictureButton;
 
-    //TODO: Consider focus
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         cameraAction = new CameraAction(TAG);
-       // Button takePictureButton;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
-
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 takePicture();
             }
         });
-
 
     }
 
@@ -117,7 +115,7 @@ public class CameraActivity extends AppCompatActivity {
 
         resultIntent.putExtra(PASS_EXTRA_SCORE, score);
         setResult(RESULT_OK, resultIntent);
-      //  finish();
+        //  finish();
 
 
     }
@@ -221,7 +219,7 @@ public class CameraActivity extends AppCompatActivity {
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     try {
-                        int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
+                        int rotation = getRotationCompensation(cameraId,  CameraActivity.this, getApplicationContext());
                         FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
                         labelObject(firebaseImage);
                     } catch (CameraAccessException e) {
@@ -239,6 +237,7 @@ public class CameraActivity extends AppCompatActivity {
                         Log.e(TAG, e.getMessage());
                     }
                 }
+
                 @Override
                 public void onConfigureFailed(CameraCaptureSession session) {
                 }
@@ -247,6 +246,7 @@ public class CameraActivity extends AppCompatActivity {
             Log.e(TAG, e.getMessage());
         }
     }
+
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
@@ -266,6 +266,7 @@ public class CameraActivity extends AppCompatActivity {
                     cameraCaptureSessions = cameraCaptureSession;
                     updatePreview();
                 }
+
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
@@ -296,8 +297,9 @@ public class CameraActivity extends AppCompatActivity {
         }
         Log.e(TAG, "openCamera X");
     }
+
     protected void updatePreview() {
-        if(null == cameraDevice) {
+        if (null == cameraDevice) {
             Log.e(TAG, "updatePreview error, return");
         }
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
@@ -307,6 +309,7 @@ public class CameraActivity extends AppCompatActivity {
             Log.e(TAG, e.getMessage());
         }
     }
+
     private void closeCamera() {
         if (cameraDevice != null) {
             cameraDevice.close();
@@ -328,6 +331,7 @@ public class CameraActivity extends AppCompatActivity {
             }
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -339,6 +343,7 @@ public class CameraActivity extends AppCompatActivity {
             textureView.setSurfaceTextureListener(textureListener);
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
