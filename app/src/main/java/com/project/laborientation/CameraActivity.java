@@ -3,7 +3,10 @@ package com.project.laborientation;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -34,9 +37,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -45,8 +50,8 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
-import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.project.laborientation.Quiz.Category;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,16 +76,27 @@ public class CameraActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Image image;
+    public String currentObject;
+    private CameraAction cameraAction;
+    public static final String EXTRA_CATEGORY_ID = "extraCategoryID";
+    public static final String EXTRA_CATEGORY_Name = "extraCategoryName";
 
-    //TODO: Consider flash + focus
+    public static final String PASS_EXTRA_SCORE = "extraScore";
+
+    private int highscore = 0;
+    Button takePictureButton;
+
+    //TODO: Consider focus
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Button takePictureButton;
+        cameraAction = new CameraAction(TAG);
+       // Button takePictureButton;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
+
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,6 +106,22 @@ public class CameraActivity extends AppCompatActivity {
 
 
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        int score = data.getIntExtra(QuizActivity.EXTRA_SCORE, 0);
+
+        highscore = score;
+
+        Intent resultIntent = getIntent();
+
+        resultIntent.putExtra(PASS_EXTRA_SCORE, score);
+        setResult(RESULT_OK, resultIntent);
+      //  finish();
+
+
+    }
+
     //This listener responds to events related to the listener
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -170,7 +202,7 @@ public class CameraActivity extends AppCompatActivity {
                 height = jpegSizes[0].getHeight();
             }
             ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 1);
-            List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+            List<Surface> outputSurfaces = new ArrayList<>(2);
             outputSurfaces.add(reader.getSurface());
             outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
@@ -192,7 +224,6 @@ public class CameraActivity extends AppCompatActivity {
                         int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
                         FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
                         labelObject(firebaseImage);
-                        // detectText(firebaseImage);
                     } catch (CameraAccessException e) {
                         Log.e(TAG, e.getMessage());
                     }
@@ -316,72 +347,6 @@ public class CameraActivity extends AppCompatActivity {
         stopBackgroundThread();
     }
 
-    private void labelObject(FirebaseVisionImage image) {
-        FirebaseLocalModel localModel = new FirebaseLocalModel.Builder("oscilloscope_model")
-                .setAssetFilePath("data/manifest.json")
-                .build();
-        FirebaseModelManager.getInstance().registerLocalModel(localModel);
-        FirebaseVisionOnDeviceAutoMLImageLabelerOptions labelerOptions =
-                new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
-                        .setLocalModelName("oscilloscope_model")
-                        .setConfidenceThreshold(0)  // Evaluate your model in the Firebase console
-                        .build();
-        try {
-            FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
-                    .getOnDeviceAutoMLImageLabeler(labelerOptions);
-
-            labeler.processImage(image)
-                    .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
-                        @Override
-                        public void onSuccess(List<FirebaseVisionImageLabel> labels) {
-                            float confidenceLevel = 0;
-                            for (FirebaseVisionImageLabel label : labels) {
-                                if (label.getConfidence() >= confidenceLevel) {
-                                    confidenceLevel = label.getConfidence();
-                                    String text = label.getText();
-                                    Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    });
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
-
-    private void detectText(FirebaseVisionImage image) {
-        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-        detector.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-            @Override
-            public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                processTxt(firebaseVisionText);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
-    }
-
-    private void processTxt(FirebaseVisionText text) {
-        List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
-        if (blocks.size() == 0) {
-            Toast.makeText(CameraActivity.this, "No Text :(", Toast.LENGTH_LONG).show();
-            return;
-        }
-        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
-            String txt = block.getText();
-            Toast.makeText(CameraActivity.this, txt, Toast.LENGTH_LONG).show();
-        }
-    }
-
     /**
      * Get the angle by which an image must be rotated given the device's current
      * orientation.
@@ -425,5 +390,47 @@ public class CameraActivity extends AppCompatActivity {
         }
         return result;
     }
+
+    void labelObject(FirebaseVisionImage image) {
+        Log.i(TAG, "Registering model");
+        FirebaseLocalModel localModel = new FirebaseLocalModel.Builder("lab_model")
+                .setAssetFilePath("data/manifest.json")
+                .build();
+        FirebaseModelManager.getInstance().registerLocalModel(localModel);
+        FirebaseVisionOnDeviceAutoMLImageLabelerOptions labelerOptions =
+                new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
+                        .setLocalModelName("lab_model")
+                        .setConfidenceThreshold(0)  // Evaluate your model in the Firebase console
+                        .build();
+        try {
+            Log.i(TAG, "Labeling image");
+            FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions);
+            labeler.processImage(image)
+                    .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                        @Override
+                        public void onSuccess(List<FirebaseVisionImageLabel> labels) {
+                            Log.i(TAG, "Succeeded");
+                            currentObject = labels.get(0).getText();
+                            Log.i(TAG, currentObject);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("OBJECT",currentObject);
+                            DialogFragment optionFragment = new OptionsDialog();
+                            optionFragment.setArguments(bundle);
+                            optionFragment.show(getSupportFragmentManager(), "optionsDialog");
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, e.getMessage());
+                            Toast.makeText(CameraActivity.this, "Unable to detect object", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
 
 }
