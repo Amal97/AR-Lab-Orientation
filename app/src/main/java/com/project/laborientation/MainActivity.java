@@ -49,21 +49,12 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivity";
 
 
-    public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String KEY_HIGHSCORE = "sharedPrefs";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textViewHighscore = findViewById(R.id.text_view_highscore);
-        spinnerCategory = findViewById(R.id.spinner_category);
-        loadCategories();
-        loadHighscore();
-
-        Button button_text = findViewById(R.id.button_text);
         // Initialize Facebook Login button
         mCallbackManager = CallbackManager.Factory.create();
         loginButton = (LoginButton) findViewById(R.id.fb_login_button);
@@ -71,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        // App code
+                        Intent cameraIntent = new Intent(getBaseContext(), CameraActivity.class);
+                        startActivity(cameraIntent);
                     }
 
                     @Override
@@ -95,33 +87,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void loadCategories(){
-        QuizDbHelper dbHelper = QuizDbHelper.getInstance(this);
-        List<Category> categories = dbHelper.getAllCategories();
-
-        ArrayAdapter<Category> adapterCategories = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
-        adapterCategories.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategory.setAdapter(adapterCategories);
-
-    }
-
-
-    private void loadHighscore(){
-        SharedPreferences prefs = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        highscore = prefs.getInt(KEY_HIGHSCORE, 0);
-        textViewHighscore.setText("HighScore: " + highscore);
-    }
-
-    private void updateHighscore(int highscoreNew){
-        highscore = highscoreNew;
-        textViewHighscore.setText("HighScore: " + highscore);
-
-        SharedPreferences prefs = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(KEY_HIGHSCORE, highscore);
-        editor.apply();
-
-    }
 
 
 }
