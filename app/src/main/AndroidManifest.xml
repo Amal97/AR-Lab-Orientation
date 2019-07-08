@@ -18,10 +18,7 @@
         android:roundIcon="@drawable/multimeter"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".Util.CameraActivity2"
-            android:label="@string/title_activity_camera2"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
         <activity android:name=".InteractiveActivity" />
