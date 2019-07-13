@@ -45,9 +45,8 @@ public class MainActivity extends AppCompatActivity {
         button_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent cameraIntent = new Intent(getBaseContext(), CameraActivity.class);
-                startActivityForResult(cameraIntent, 1);
-             //   startActivity(cameraIntent);
+                Intent cameraIntent = new Intent(getBaseContext(), InteractiveActivity.class);
+                startActivity(cameraIntent);
             }
         });
     }
