@@ -12,12 +12,20 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class InteractiveActivity extends AppCompatActivity {
     ImageView mEquipment;
@@ -29,18 +37,18 @@ public class InteractiveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interactive);
         mEquipment = findViewById(R.id.initial_image);
-        mEquipment.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                int rgb = getColour(Math.round(motionEvent.getX()), Math.round(motionEvent.getY()));
-                handleColor(Integer.toHexString(rgb));
-                return false;
-            }
+        mEquipment.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            int positionX = Math.round(motionEvent.getX());
+            int positionY = Math.round(motionEvent.getY());
+            int rgb = getColour(positionX, positionY);
+            handleColor(Integer.toHexString(rgb));
+            return false;
         });
     }
 
     private int getColour( int x, int y)
     {
+        Log.d(TAG, "Identifying color");
         LinearLayout mInteractiveLayout = findViewById(R.id.interactive_layout);
         Drawable transparentEquipmentDrawable = ContextCompat.getDrawable(this, R.drawable.best_transparent);
         transparentEquipmentDrawable.setBounds(0, 0, mInteractiveLayout.getWidth(), mInteractiveLayout.getHeight());
@@ -52,27 +60,75 @@ public class InteractiveActivity extends AppCompatActivity {
     }
 
     private void handleColor(String colorHex) {
+        LinearLayout interactiveLayout = findViewById(R.id.interactive_layout);
+
         switch (colorHex) {
             case "ffffaec7":
-                Toast.makeText(InteractiveActivity.this, "Power Button", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Power button", Snackbar.LENGTH_LONG)
+                        .show();
                 break;
             case "ffb97b56":
-                Toast.makeText(InteractiveActivity.this, "Voltage", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Slave Voltage", Snackbar.LENGTH_LONG)
+                        .show();
                 break;
             case "ffffca18":
-                Toast.makeText(InteractiveActivity.this, "Current", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Current", Snackbar.LENGTH_LONG)
+                        .show();
                 break;
             case "ff0ed145":
-                Toast.makeText(InteractiveActivity.this, "Master Voltage", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Master Voltagre", Snackbar.LENGTH_LONG)
+                        .show();
                 break;
             case "ffeb1c24":
-                Toast.makeText(InteractiveActivity.this, "Knobs", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Knobs", Snackbar.LENGTH_LONG)
+                        .show();
                 break;
             case "ff3f47cc":
-                Toast.makeText(InteractiveActivity.this, "Screen", Toast.LENGTH_LONG).show();
+                Snackbar.make(interactiveLayout, "Screen", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            default:
                 break;
         }
+    }
+/*
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.equipment_popup, null);
+        int width = (mInteractiveLayout.getWidth() * 2)/3;
+        int height = mInteractiveLayout.getHeight()/3;
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
+        popupWindow.showAtLocation(findViewById(R.id.interactive_layout), Gravity.CENTER, 0, 0);
+        TextView tv = popupWindow.getContentView().findViewById(R.id.popup_text);
+        switch (colorHex) {
+            case "ffffaec7":
+                changeText(tv, "Power button", popupWindow.getContentView());
+                break;
+            case "ffb97b56":
+                changeText(tv, "Voltage", popupWindow.getContentView());
+                break;
+            case "ffffca18":
+                changeText(tv, "Current", popupWindow.getContentView());
+                break;
+            case "ff0ed145":
+                changeText(tv, "Master voltage", popupWindow.getContentView());
+                break;
+            case "ffeb1c24":
+                changeText(tv, "Knobs", popupWindow.getContentView());
+                break;
+            case "ff3f47cc":
+                changeText(tv, "Screen", popupWindow.getContentView());
+                break;
+            default:
+                break;
+        }
+        RotateAnimation rotate= (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.rotate);
+        popupView.setAnimation(rotate);
 
     }
+
+    private void changeText(TextView tv, String text, View view) {
+        tv.setText(text);
+        view.setVisibility(View.VISIBLE);
+    }*/
 
 }
