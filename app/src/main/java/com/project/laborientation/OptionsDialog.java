@@ -11,7 +11,7 @@ import android.graphics.Camera;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.project.laborientation.MainCameraActivity;
+import com.project.laborientation.CameraActivity;
 import com.project.laborientation.Quiz.Category;
 import com.project.laborientation.Quiz.QuizDbHelper;
 import com.project.laborientation.R;
@@ -76,16 +76,16 @@ public class OptionsDialog extends DialogFragment {
 
     private void startQuiz(){
         Intent myIntent = new Intent(getActivity(), QuizActivity.class);
-        myIntent.putExtra(MainCameraActivity.EXTRA_CATEGORY_ID, categoryID);
-        myIntent.putExtra(MainCameraActivity.EXTRA_CATEGORY_Name, categoryName);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
         startActivityForResult(myIntent, 1);
        // startActivity(myIntent);
     }
 
     private void startVideo() {
         Intent myIntent = new Intent(getActivity(), VideoActivity.class);
-        myIntent.putExtra(MainCameraActivity.EXTRA_CATEGORY_ID, categoryID);
-        myIntent.putExtra(MainCameraActivity.EXTRA_CATEGORY_Name, categoryName);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
         startActivity(myIntent);
     }
 
