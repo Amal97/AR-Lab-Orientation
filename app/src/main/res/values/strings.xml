@@ -24,6 +24,6 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
-    <string name="menu_status">Status</string>
+    <string name="menu_progress">Progress</string>
     <string name="menu_profile">Profile</string>
 </resources>

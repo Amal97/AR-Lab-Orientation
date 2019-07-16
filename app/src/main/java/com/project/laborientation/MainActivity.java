@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(LoginResult loginResult) {
                         Intent cameraIntent = new Intent(getBaseContext(), CameraActivity.class);
                         startActivity(cameraIntent);
+                        finish();
                     }
 
                     @Override
