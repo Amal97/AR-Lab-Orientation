@@ -6,10 +6,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-feature android:name="android.hardware.camera.ar" android:required="true"/>
-
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
     <uses-feature android:name="android.hardware.camera2.full" />
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -21,17 +21,16 @@
         android:roundIcon="@drawable/multimeter"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.google.ar.core" android:value="required" />
+        <activity android:name=".ImageArActivity"></activity>
 
-        <activity android:name=".ARActivity">
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" />
 
-        </activity>
+        <activity android:name=".ARActivity"></activity>
         <activity
             android:name=".CameraActivity"
-            android:label="@string/title_activity_main_camera"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
         <activity android:name=".InteractiveActivity" />
@@ -44,13 +43,8 @@
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity
-            android:name=".CameraActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainActivity">
             <intent-filter>
-
-
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
