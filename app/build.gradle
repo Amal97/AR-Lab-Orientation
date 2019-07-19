@@ -8,13 +8,17 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        minSdkVersion 21
+        minSdkVersion 24
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     aaptOptions {
@@ -40,5 +44,17 @@ dependencies {
     implementation files('libs/YouTubeAndroidPlayerApi.jar')
 
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    implementation 'com.google.firebase:firebase-database:18.0.0'
+    implementation 'com.firebase:firebase-client-android:2.3.1'
+
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.10.0'
+
 }
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.ar.sceneform.plugin'
+
+
+sceneform.asset('sampledata/ArcticFox_Posed.obj',
+        'default',
+        'sampledata/ArcticFox_Posed.sfa',
+        'src/main/assets/ArcticFox_Posed')
