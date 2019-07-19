@@ -126,14 +126,6 @@ public class CameraActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
@@ -151,8 +143,8 @@ public class CameraActivity extends AppCompatActivity
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
                                                        AccessToken currentAccessToken) {
                 if (currentAccessToken == null) {
-                    Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(mainIntent);
+                    Intent loginIntent = new Intent(getBaseContext(), LoginActivity.class);
+                    startActivity(loginIntent);
                     finish();
                 }
             }
