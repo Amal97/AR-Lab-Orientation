@@ -21,6 +21,9 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.Profile;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -61,6 +64,7 @@ import androidx.fragment.app.DialogFragment;
 
 import android.view.Menu;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -89,8 +93,10 @@ public class CameraActivity extends AppCompatActivity
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Image image;
-    public String currentObject;
-    private CameraAction cameraAction;
+    private AccessTokenTracker accessTokenTracker;
+    private String currentObject;
+    private TextView mName;
+    private String userName;
     public static final String EXTRA_CATEGORY_ID = "extraCategoryID";
     public static final String EXTRA_CATEGORY_Name = "extraCategoryName";
 
@@ -103,7 +109,6 @@ public class CameraActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        cameraAction = new CameraAction(TAG);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main_camera);
@@ -118,6 +123,7 @@ public class CameraActivity extends AppCompatActivity
             }
         });
 
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -130,11 +136,28 @@ public class CameraActivity extends AppCompatActivity
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        mName = headerView.findViewById(R.id.fb_name);
+        Profile profile = Profile.getCurrentProfile();
+        userName = profile.getFirstName() + " " +  profile.getLastName();
+        mName.setText(userName);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
+                                                       AccessToken currentAccessToken) {
+                if (currentAccessToken == null) {
+                    Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            }
+        };
+
     }
 
     @Override
@@ -314,6 +337,7 @@ public class CameraActivity extends AppCompatActivity
             Log.e(TAG, e.getMessage());
         }
     }
+
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
