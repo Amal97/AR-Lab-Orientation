@@ -3,5 +3,6 @@
     <string-array name="options_array">
         <item>Video</item>
         <item>Quiz</item>
+        <item>Interactive</item>
     </string-array>
 </resources>
