@@ -18,6 +18,7 @@ import com.project.laborientation.R;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class OptionsDialog extends DialogFragment {
     private static final String TAG = "OptionsDialog";
@@ -29,13 +30,15 @@ public class OptionsDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
+        if (bundle.getString("OBJECT") == null) {
+            finish();
+        }
         object = bundle.getString("OBJECT");
         initializeVariables();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         //TODO: options_array is static right now, options likely to change depending
         builder.setTitle(getTitle())
-                .setItems(R.array.options_array, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+                .setItems(R.array.options_array, (DialogInterface dialog, int which) -> {
                         if (which == 0) {
                             startVideo();
                         } else if (which == 1) {
@@ -44,7 +47,7 @@ public class OptionsDialog extends DialogFragment {
                             startInteractive();
                         }
                     }
-                });
+                );
         return builder.create();
     }
 
@@ -81,7 +84,6 @@ public class OptionsDialog extends DialogFragment {
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
         startActivityForResult(myIntent, 1);
-       // startActivity(myIntent);
     }
 
     private void startVideo() {
