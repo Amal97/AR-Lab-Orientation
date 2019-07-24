@@ -38,8 +38,10 @@ public class OptionsDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
                             startVideo();
-                        } else {
+                        } else if (which == 1) {
                             startQuiz();
+                        } else {
+                            startInteractive();
                         }
                     }
                 });
@@ -89,5 +91,11 @@ public class OptionsDialog extends DialogFragment {
         startActivity(myIntent);
     }
 
+    private void startInteractive() {
+        Intent myIntent = new Intent(getActivity(), InteractiveActivity.class);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
+        startActivity(myIntent);
+    }
 
 }
