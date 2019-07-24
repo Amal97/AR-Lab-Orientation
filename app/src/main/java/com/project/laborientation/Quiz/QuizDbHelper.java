@@ -19,6 +19,12 @@ public class QuizDbHelper extends SQLiteOpenHelper {
 
     private static  QuizDbHelper instance;
     private SQLiteDatabase db;
+    private int c1_counter;
+    private int c2_counter;
+    private int c3_counter;
+    private int c4_counter;
+    private int c5_counter;
+
 
     private QuizDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -56,12 +62,20 @@ public class QuizDbHelper extends SQLiteOpenHelper {
                 CategoriesTable.TABLE_NAME + "(" + CategoriesTable._ID + ")" + "ON DELETE CASCADE" +
                 ")";
 
+        final String SQL_CREATE_TRACKER_TABLE = "CREATE TABLE " +
+                QuizTrackerTable.TABLE_NAME + "( " +
+                QuizTrackerTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                QuizTrackerTable.COLUMN_NAME + " TEXT, " +
+                QuizTrackerTable.TOTAL_QUESTIONS + " INTEGER, " +
+                QuizTrackerTable.ANSWERED_CORRECTLY + " INTEGER " +
+                ")";
+
         db.execSQL(SQL_CREATE_CATEGORIES_TABLE);
         db.execSQL(SQL_CREATE_QUESTIONS_TABLE);
+        db.execSQL(SQL_CREATE_TRACKER_TABLE);
         fillCategoriesTable();
         fillQuestionsTable();
-
-
+        addTotalQuestions();
     }
 
     @Override
@@ -88,6 +102,52 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         addCategory(c4);
         Category c5 = new Category("Phoebe");
         addCategory(c5);
+    }
+
+
+    public void addTotalQuestions(){
+        QuizTracker tracker1 = new QuizTracker(Category.OSCILLOSCOPE, "Oscilloscope", c1_counter);
+        addQuestionTracker(tracker1);
+        QuizTracker tracker2 = new QuizTracker(Category.MULTIMETER, "Multimeter", c2_counter);
+        addQuestionTracker(tracker2);
+        QuizTracker tracker3 = new QuizTracker(Category.POWER_SUPPLY, "Power Supply", c3_counter);
+        addQuestionTracker(tracker3);
+        QuizTracker tracker4 = new QuizTracker(Category.WAVEFORM_GENERATOR, "Waveform Generator", c4_counter);
+        addQuestionTracker(tracker4);
+        QuizTracker tracker5 = new QuizTracker(Category.PHOEBE, "Phoebe", c5_counter);
+        addQuestionTracker(tracker5);
+    }
+
+    private void addQuestionTracker(QuizTracker tracker){
+        ContentValues cv = new ContentValues();
+        cv.put(QuizTrackerTable.COLUMN_NAME, tracker.getName());
+        cv.put(QuizTrackerTable.TOTAL_QUESTIONS, tracker.getTotalQuestions());
+        cv.put(QuizTrackerTable.ANSWERED_CORRECTLY, tracker.getCorrectAnswered());
+
+        db.insert(QuizTrackerTable.TABLE_NAME, null, cv);
+    }
+
+    public void addCorectAnswers(int categoryID, int correctAnswers){
+        db = getReadableDatabase();
+
+        String[] selectionArgs = new String[]{Integer.toString(categoryID)};
+
+        Cursor c = db.rawQuery("SELECT * FROM " + QuizTrackerTable.TABLE_NAME +
+                " WHERE " + QuizTrackerTable._ID + " = ?", selectionArgs);
+
+        if(c.moveToFirst()){
+            do {
+                int totalQuestions = c.getColumnIndex(QuizTrackerTable.TOTAL_QUESTIONS);
+                if(totalQuestions == correctAnswers){
+                    ContentValues values = new ContentValues();
+                    values.put(QuizTrackerTable.ANSWERED_CORRECTLY, correctAnswers);
+
+                    db.update(QuizTrackerTable.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(categoryID)});
+                }
+
+            } while (c.moveToNext());
+
+        }
     }
 
     private void addCategory(Category category){
@@ -133,8 +193,6 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         Question q12 = new Question("How old is Phoebe?", "8", "5", "2", 1,
                 Category.PHOEBE);
         addQuestion(q12);
-
-
     }
 
     private void addQuestion( Question question){
@@ -146,6 +204,22 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         cv.put(QuestionTable.COLUMN_ANSWER_NR , question.getAnswerNr());
         cv.put(QuestionTable.COLUMN_CATEGORY_ID , question.getCategoryID());
         db.insert(QuestionTable.TABLE_NAME, null, cv);
+
+        if(question.getCategoryID() == 1){
+            c1_counter++;
+        }
+        if(question.getCategoryID() == 2){
+            c2_counter++;
+        }
+        if(question.getCategoryID() == 3){
+            c3_counter++;
+        }
+        if(question.getCategoryID() == 4){
+            c4_counter++;
+        }
+        if(question.getCategoryID() == 5){
+            c5_counter++;
+        }
 
     }
 

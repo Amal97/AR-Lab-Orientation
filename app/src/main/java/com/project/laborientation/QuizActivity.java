@@ -50,6 +50,8 @@ public class QuizActivity extends AppCompatActivity {
     private boolean answered;
 
     private long backPressedTime;
+    private int categoryID;
+    private QuizDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,18 +72,17 @@ public class QuizActivity extends AppCompatActivity {
         textColorDefaultRb = rb1.getTextColors();
 
         Intent intent = getIntent();
-        int categoryID = intent.getIntExtra(CameraActivity.EXTRA_CATEGORY_ID, 0);
+        categoryID = intent.getIntExtra(CameraActivity.EXTRA_CATEGORY_ID, 0);
         String categoryName = intent.getStringExtra(CameraActivity.EXTRA_CATEGORY_Name);
 
         textViewCategory.setText("Category: " + categoryName);
 
         if(savedInstanceState == null){
-            QuizDbHelper dbHelper = QuizDbHelper.getInstance(this);
+            dbHelper = QuizDbHelper.getInstance(this);
             questionList = dbHelper.getQuestions(categoryID);
             questionCountTotal = questionList.size();
             Collections.shuffle(questionList);
             showNextQuestion();
-
         }
         else{
             questionList = savedInstanceState.getParcelableArrayList(KEY_QUESTION_LIST);
@@ -131,6 +132,7 @@ public class QuizActivity extends AppCompatActivity {
             buttonConfirmNext.setText("Confirm");
         }
         else{
+            dbHelper.addCorectAnswers(categoryID, score);
             finishQuiz();
         }
     }
@@ -182,6 +184,7 @@ public class QuizActivity extends AppCompatActivity {
         Intent resultIntent = new Intent();
         resultIntent.putExtra(EXTRA_SCORE, score);
         setResult(RESULT_OK, resultIntent);
+
         finish();
     }
 
