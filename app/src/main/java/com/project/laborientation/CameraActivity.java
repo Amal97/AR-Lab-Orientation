@@ -115,8 +115,12 @@ public class CameraActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         mName = headerView.findViewById(R.id.fb_name);
-        Profile profile = Profile.getCurrentProfile();
-        userName = profile.getFirstName() + " " +  profile.getLastName();
+        if (Profile.getCurrentProfile() != null) {
+            Profile profile = Profile.getCurrentProfile();
+            userName = profile.getFirstName() + " " + profile.getLastName();
+        } else {
+            userName = "Guest";
+        }
         mName.setText(userName);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

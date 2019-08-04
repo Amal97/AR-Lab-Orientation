@@ -5,7 +5,6 @@
     <string name="take_picture">Take a photo</string>
     <string name="facebook_application_id" translatable="false">1273685149473684</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb1273685149473684</string>
-
     <string name="player_error">Error initializing YouTube player: %s</string>
     <string name="seek_to">Jump To</string>
     <string name="seek_to_hint">Seconds</string>

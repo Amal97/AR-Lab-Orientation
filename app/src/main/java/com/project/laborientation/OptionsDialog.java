@@ -30,9 +30,6 @@ public class OptionsDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        if (bundle.getString("OBJECT") == null) {
-            finish();
-        }
         object = bundle.getString("OBJECT");
         initializeVariables();
         AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
