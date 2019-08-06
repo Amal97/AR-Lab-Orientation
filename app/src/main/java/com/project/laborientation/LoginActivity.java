@@ -5,12 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
     CallbackManager mCallbackManager;
@@ -20,7 +27,17 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Initialize Facebook Login button
+
+        if (AccessToken.getCurrentAccessToken() != null) {
+            Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(mainIntent);
+            finish();
+        }
+
+        Button facebookButton = findViewById(R.id.fb_login_button);
+        Button guestButton = findViewById(R.id.login_guest);
+
+
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -41,7 +58,15 @@ public class LoginActivity extends AppCompatActivity {
                         Log.e(TAG, exception.toString());
                     }
                 });
-
+        facebookButton.setOnClickListener((View view) -> {
+            com.facebook.login.widget.LoginButton btn = new LoginButton(this);
+            btn.performClick();
+        });
+        guestButton.setOnClickListener((View view) -> {
+            Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(mainIntent);
+            finish();
+        });
     }
 
     @Override

@@ -20,41 +20,35 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
-
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.Profile;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.MenuItem;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
-import android.view.MenuItem;
-
+import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
-import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -66,7 +60,6 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -100,9 +93,6 @@ public class CameraActivity extends AppCompatActivity
     public static final String EXTRA_CATEGORY_ID = "extraCategoryID";
     public static final String EXTRA_CATEGORY_Name = "extraCategoryName";
 
-    public static final String PASS_EXTRA_SCORE = "extraScore";
-
-    private int highscore = 0;
     Button takePictureButton;
 
 
@@ -116,12 +106,8 @@ public class CameraActivity extends AppCompatActivity
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePicture();
-            }
-        });
+        takePictureButton.setOnClickListener((View v) ->
+                takePicture());
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -130,8 +116,13 @@ public class CameraActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         mName = headerView.findViewById(R.id.fb_name);
-        Profile profile = Profile.getCurrentProfile();
-        userName = profile.getFirstName() + " " +  profile.getLastName();
+        try {
+            Profile profile = Profile.getCurrentProfile();
+            userName = profile.getFirstName() + " " + profile.getLastName();
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage());
+            userName = "Guest";
+        }
         mName.setText(userName);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -191,11 +182,16 @@ public class CameraActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(mainIntent);
+            finish();
         } else if (id == R.id.nav_status) {
 
-        } else if (id == R.id.nav_profile) {
-
+        } else if (id == R.id.logout) {
+            LoginManager.getInstance().logOut();
+            Intent loginIntent = new Intent(getBaseContext(), LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -291,12 +287,7 @@ public class CameraActivity extends AppCompatActivity
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
             // Orientation
-            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
-                @Override
-                public void onImageAvailable(ImageReader reader) {
-                    image = reader.acquireLatestImage();
-                }
-            };
+            ImageReader.OnImageAvailableListener readerListener = reader1 -> image = reader1.acquireLatestImage();
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
             final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
                 @Override
@@ -489,41 +480,44 @@ public class CameraActivity extends AppCompatActivity
             Log.i(TAG, "Labeling image");
             FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions);
             labeler.processImage(image)
-                    .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
-                        @Override
-                        public void onSuccess(List<FirebaseVisionImageLabel> labels) {
-                            Log.i(TAG, "Succeeded");
-                            currentObject = labels.get(0).getText();
-                            Log.i(TAG, currentObject);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("OBJECT",currentObject);
-                            DialogFragment optionFragment = new OptionsDialog();
-                            optionFragment.setArguments(bundle);
-                            optionFragment.show(getSupportFragmentManager(), "optionsDialog");
+                    .addOnSuccessListener(labels -> {
+                        Log.i(TAG, "Succeeded");
+                        currentObject = labels.get(0).getText();
+                        Log.i(TAG, currentObject);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("OBJECT",currentObject);
+                        DialogFragment optionFragment = new OptionsDialog();
+                        optionFragment.setArguments(bundle);
+                        optionFragment.show(getSupportFragmentManager(), "optionsDialog");
 
-                        }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, e.getMessage());
-                            Toast.makeText(CameraActivity.this, "Unable to detect object", Toast.LENGTH_SHORT).show();
-                        }
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, e.getMessage());
+                        Toast.makeText(CameraActivity.this, "Unable to detect object", Toast.LENGTH_SHORT).show();
                     });
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
     }
 
+    public void detectText(FirebaseVisionImage image) {
+        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+        detector.processImage(image).addOnSuccessListener(firebaseVisionText -> processText(firebaseVisionText)).addOnFailureListener((@NonNull Exception e) -> {
+            //Nothing here
+        });
+    }
 
 
-
-
-
-
-
-
-
+    private void processText(FirebaseVisionText text) {
+        List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
+        if (blocks.size() == 0) {
+            return;
+        }
+        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
+            String txt = block.getText();
+            Log.e(TAG, txt);
+        }
+    }
 
 
 }
