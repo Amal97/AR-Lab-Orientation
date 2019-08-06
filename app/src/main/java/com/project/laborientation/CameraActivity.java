@@ -37,6 +37,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+
+import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
@@ -58,7 +60,6 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,10 +116,11 @@ public class CameraActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         mName = headerView.findViewById(R.id.fb_name);
-        if (Profile.getCurrentProfile() != null) {
+        try {
             Profile profile = Profile.getCurrentProfile();
             userName = profile.getFirstName() + " " + profile.getLastName();
-        } else {
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage());
             userName = "Guest";
         }
         mName.setText(userName);
@@ -180,11 +182,16 @@ public class CameraActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(mainIntent);
+            finish();
         } else if (id == R.id.nav_status) {
 
-        } else if (id == R.id.nav_profile) {
-
+        } else if (id == R.id.logout) {
+            LoginManager.getInstance().logOut();
+            Intent loginIntent = new Intent(getBaseContext(), LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -511,14 +518,6 @@ public class CameraActivity extends AppCompatActivity
             Log.e(TAG, txt);
         }
     }
-
-
-
-
-
-
-
-
 
 
 }

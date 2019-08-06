@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.7"
+        android:contentDescription="clockTower"
+        android:src="@drawable/clock_tower" />
 <LinearLayout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#00897B"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".LoginActivity">
@@ -37,3 +46,4 @@
         android:textSize="15sp"
         app:iconTint="#000" />
 </LinearLayout>
+</FrameLayout>
