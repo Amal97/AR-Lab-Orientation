@@ -22,5 +22,6 @@ obj/
 *.apk
 *.ap_
 *.class
+images
 
 output.json
