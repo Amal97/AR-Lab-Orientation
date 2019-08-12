@@ -1,0 +1,5 @@
+multimeter
+oscilloscope
+phoebe
+powersupply
+waveformgenerator

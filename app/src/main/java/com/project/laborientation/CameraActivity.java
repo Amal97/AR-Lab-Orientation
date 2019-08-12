@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -25,6 +28,7 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.Profile;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Trace;
 import android.util.Log;
 import android.view.MenuItem;
 import android.util.Size;
@@ -60,6 +64,8 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,6 +98,14 @@ public class CameraActivity extends AppCompatActivity
     private String userName;
     public static final String EXTRA_CATEGORY_ID = "extraCategoryID";
     public static final String EXTRA_CATEGORY_Name = "extraCategoryName";
+    private MSCognitiveServicesClassifier classifier;
+    protected byte[][] yuvBytes=new byte[3][];
+    private int[] rgbBytes = null;
+    protected int previewWidth = 0;
+    protected int previewHeight = 0;
+    protected boolean computing = false;
+    protected int yRowStride;
+    protected Bitmap rgbFrameBitmap = null;
 
     Button takePictureButton;
 
@@ -108,6 +122,7 @@ public class CameraActivity extends AppCompatActivity
         takePictureButton = findViewById(R.id.btn_takepicture);
         takePictureButton.setOnClickListener((View v) ->
                 takePicture());
+        classifier = new MSCognitiveServicesClassifier(CameraActivity.this);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -294,9 +309,40 @@ public class CameraActivity extends AppCompatActivity
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     try {
+                        previewHeight = getScreenHeight();
+                        previewWidth = getScreenWidth();
+                        rgbBytes = new int[previewWidth * previewHeight];
                         int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
-                        FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
-                        labelObject(firebaseImage);
+                        if (image == null) {
+                            return;
+                        }
+
+                        if (computing) {
+                            image.close();
+                            return;
+                        }
+                        computing = true;
+                        Trace.beginSection("imageAvailable");
+                        final Image.Plane[] planes = image.getPlanes();
+                        fillBytes(planes, yuvBytes);
+                        yRowStride = planes[0].getRowStride();
+                        final int uvRowStride = planes[1].getRowStride();
+                        final int uvPixelStride = planes[1].getPixelStride();
+                        ImageUtils.convertYUV420ToARGB8888(
+                                yuvBytes[0],
+                                yuvBytes[1],
+                                yuvBytes[2],
+                                previewWidth,
+                                previewHeight,
+                                yRowStride,
+                                uvRowStride,
+                                uvPixelStride,
+                                rgbBytes);
+                        image.close();
+                        rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
+
+                        Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, rotation);
+                        Toast.makeText(CameraActivity.this, r.getTitle() + r.toString(), Toast.LENGTH_LONG).show();
                     } catch (CameraAccessException e) {
                         Log.e(TAG, e.getMessage());
                     }
@@ -520,4 +566,23 @@ public class CameraActivity extends AppCompatActivity
     }
 
 
+    protected void fillBytes(final Image.Plane[] planes, final byte[][] yuvBytes) {
+        // Because of the variable row stride it's not possible to know in
+        // advance the actual necessary dimensions of the yuv planes.
+        for (int i = 0; i < planes.length; ++i) {
+            final ByteBuffer buffer = planes[i].getBuffer();
+            if (yuvBytes[i] == null) {
+                yuvBytes[i] = new byte[buffer.capacity()];
+            }
+            buffer.get(yuvBytes[i]);
+        }
+    }
+
+    public int getScreenWidth() {
+        return this.getWindow().getDecorView().getWidth();
+    }
+
+    public  int getScreenHeight() {
+        return this.getWindow().getDecorView().getHeight();
+    }
 }
