@@ -24,6 +24,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.widget.ImageView;
 
 
 import org.tensorflow.Operation;
