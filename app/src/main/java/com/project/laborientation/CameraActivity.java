@@ -1,10 +1,10 @@
 package com.project.laborientation;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -12,19 +12,20 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Build;
+import android.media.ImageReader.OnImageAvailableListener;
 import android.os.Bundle;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.Profile;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Trace;
 import android.util.Log;
 import android.view.MenuItem;
 import android.util.Size;
@@ -33,22 +34,13 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.vision.FirebaseVision;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
-import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
-import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
-import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.project.laborientation.Util.ImageUtils;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -60,13 +52,18 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class CameraActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int MINIMUM_PREVIEW_SIZE = 320;
     private static final String TAG = "CameraActivity";
     private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -78,7 +75,6 @@ public class CameraActivity extends AppCompatActivity
     }
     private String cameraId;
     protected CameraDevice cameraDevice;
-    protected CameraCaptureSession cameraCaptureSessions;
     protected CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
     private ImageReader imageReader;
@@ -87,11 +83,23 @@ public class CameraActivity extends AppCompatActivity
     private HandlerThread mBackgroundThread;
     private Image image;
     private AccessTokenTracker accessTokenTracker;
-    private String currentObject;
     private TextView mName;
     private String userName;
     public static final String EXTRA_CATEGORY_ID = "extraCategoryID";
     public static final String EXTRA_CATEGORY_Name = "extraCategoryName";
+    private MSCognitiveServicesClassifier classifier;
+    protected byte[][] yuvBytes=new byte[3][];
+    private int[] rgbBytes = null;
+    protected int previewWidth = 0;
+    protected int previewHeight = 0;
+    protected boolean computing = false;
+    protected int yRowStride;
+    protected Bitmap rgbFrameBitmap = null;
+    private int height = 0;
+    private int width = 0;
+    private int sensorOrientation = 0;
+    private CaptureRequest previewRequest;
+    private CameraCaptureSession captureSession;
 
     Button takePictureButton;
 
@@ -108,6 +116,7 @@ public class CameraActivity extends AppCompatActivity
         takePictureButton = findViewById(R.id.btn_takepicture);
         takePictureButton.setOnClickListener((View v) ->
                 takePicture());
+        classifier = new MSCognitiveServicesClassifier(CameraActivity.this);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -143,6 +152,7 @@ public class CameraActivity extends AppCompatActivity
 
     }
 
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -175,7 +185,6 @@ public class CameraActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -199,7 +208,6 @@ public class CameraActivity extends AppCompatActivity
         return true;
     }
 
-
     //This listener responds to events related to the listener
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -219,6 +227,7 @@ public class CameraActivity extends AppCompatActivity
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
     };
+
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
@@ -238,13 +247,6 @@ public class CameraActivity extends AppCompatActivity
         }
     };
 
-    final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
-        @Override
-        public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-            super.onCaptureCompleted(session, request, result);
-            createCameraPreview();
-        }
-    };
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
@@ -260,91 +262,138 @@ public class CameraActivity extends AppCompatActivity
             Log.e(TAG, e.getMessage());
         }
     }
+
+    private final CameraCaptureSession.CaptureCallback captureCallback =
+            new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureProgressed(
+                        final CameraCaptureSession session,
+                        final CaptureRequest request,
+                        final CaptureResult partialResult) {}
+
+                @Override
+                public void onCaptureCompleted(
+                        final CameraCaptureSession session,
+                        final CaptureRequest request,
+                        final TotalCaptureResult result) {}
+            };
+
     protected void takePicture() {
         if(null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
             return;
         }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        try {
-            //TODO: See what this can return if it cannot return null?
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-            Size[] jpegSizes = null;
-            if (characteristics != null) {
-                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
-            }
-            int width = 640;
-            int height = 480;
-            if (jpegSizes != null && 0 < jpegSizes.length) {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
-            }
-            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 1);
-            List<Surface> outputSurfaces = new ArrayList<>(2);
-            outputSurfaces.add(reader.getSurface());
-            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
-            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-            // Orientation
-            ImageReader.OnImageAvailableListener readerListener = reader1 -> image = reader1.acquireLatestImage();
-            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
-            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
-                @Override
-                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-                    super.onCaptureCompleted(session, request, result);
-                    try {
-                        int rotation = getRotationCompensation(cameraId, CameraActivity.this, getApplicationContext());
-                        FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation);
-                        labelObject(firebaseImage);
-                    } catch (CameraAccessException e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                    createCameraPreview();
-                }
-            };
-            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(CameraCaptureSession session) {
-                    try {
-                        session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
-                    } catch (CameraAccessException e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                }
-                @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
-                }
-            }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            Log.e(TAG, e.getMessage());
-        }
+        computing = true;
     }
 
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
-            texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
+            texture.setDefaultBufferSize(previewWidth, previewHeight);
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(surface);
-            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback(){
-                @Override
-                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    //The camera is already closed
-                    if (null == cameraDevice) {
+
+            imageReader = ImageReader.newInstance(previewWidth, previewHeight, ImageFormat.YUV_420_888, 2);
+            OnImageAvailableListener readerListener = (reader) -> {
+                Image image = null;
+                //We need wait until we have some size from onPreviewSizeChosen
+                if (previewWidth == 0 || previewHeight == 0) {
+                    return;
+                }
+
+                rgbBytes = new int[previewWidth * previewHeight];
+
+                try {
+
+                    image = reader.acquireLatestImage();
+
+                    if (image == null) {
+
                         return;
                     }
-                    // When the session is ready, we start displaying the preview.
-                    cameraCaptureSessions = cameraCaptureSession;
-                    updatePreview();
+
+                    if (!computing) {
+                        image.close();
+                        return;
+                    }
+                    Trace.beginSection("imageAvailable");
+                    final Image.Plane[] planes = image.getPlanes();
+                    fillBytes(planes, yuvBytes);
+                    yRowStride = planes[0].getRowStride();
+                    final int uvRowStride = planes[1].getRowStride();
+                    final int uvPixelStride = planes[1].getPixelStride();
+
+                    ImageUtils.convertYUV420ToARGB8888(
+                            yuvBytes[0],
+                            yuvBytes[1],
+                            yuvBytes[2],
+                            previewWidth,
+                            previewHeight,
+                            yRowStride,
+                            uvRowStride,
+                            uvPixelStride,
+                            rgbBytes);
+
+                    image.close();
+                    rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
+
+                    Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
+                    if (r.getConfidence() > 0.7) {
+                        openDialog(r.getTitle());
+                        computing = false;
+                    }
+                } catch (final Exception e) {
+                    Log.e(TAG, e.getMessage());
+                    if (image != null) {
+                        image.close();
+                    }
+                    Log.e(TAG, e.getMessage());
+                    Trace.endSection();
+                    return;
                 }
-                @Override
-                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
-                }
-            }, null);
+                Trace.endSection();
+            };
+            imageReader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+            captureRequestBuilder.addTarget(imageReader.getSurface());
+            cameraDevice.createCaptureSession(
+                    Arrays.asList(surface, imageReader.getSurface()),
+                    new CameraCaptureSession.StateCallback() {
+
+                        @Override
+                        public void onConfigured(final CameraCaptureSession cameraCaptureSession) {
+                            // The camera is already closed
+                            if (null == cameraDevice) {
+                                return;
+                            }
+
+                            // When the session is ready, we start displaying the preview.
+                            captureSession = cameraCaptureSession;
+                            try {
+                                // Auto focus should be continuous for camera preview.
+                                captureRequestBuilder.set(
+                                        CaptureRequest.CONTROL_AF_MODE,
+                                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                // Flash is automatically enabled when necessary.
+                                captureRequestBuilder.set(
+                                        CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+
+                                // Finally, we start displaying the camera preview.
+                                previewRequest = captureRequestBuilder.build();
+                                captureSession.setRepeatingRequest(
+                                        previewRequest, captureCallback, mBackgroundHandler);
+                            } catch (final CameraAccessException e) {
+                                Log.e(TAG, e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onConfigureFailed(final CameraCaptureSession cameraCaptureSession) {
+                            Log.e(TAG, "Failed");
+                        }
+                    },
+                    null);
         } catch (CameraAccessException e) {
             Log.e(TAG, e.getMessage());
         }
@@ -364,23 +413,28 @@ public class CameraActivity extends AppCompatActivity
                 ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
-            manager.openCamera(cameraId, stateCallback, null);
+            width = 640;
+            height = 480;
+
+            final Size inputSize = new Size(width, height);
+            Size previewSize =
+                    chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                            inputSize.getWidth(),
+                            inputSize.getHeight());
+            previewWidth = previewSize.getWidth();
+            previewHeight = previewSize.getHeight();
+
+            rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
+            yuvBytes = new byte[3][];
+            sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
+            manager.openCamera(cameraId, stateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             Log.e(TAG, e.getMessage());
         }
         Log.e(TAG, "openCamera X");
     }
-    protected void updatePreview() {
-        if(null == cameraDevice) {
-            Log.e(TAG, "updatePreview error, return");
-        }
-        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-        try {
-            cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
+
     private void closeCamera() {
         if (cameraDevice != null) {
             cameraDevice.close();
@@ -389,6 +443,10 @@ public class CameraActivity extends AppCompatActivity
         if (imageReader != null) {
             imageReader.close();
             imageReader = null;
+        }
+        if (captureSession != null) {
+            captureSession.close();
+            captureSession = null;
         }
     }
 
@@ -403,7 +461,7 @@ public class CameraActivity extends AppCompatActivity
         }
     }
     @Override
-    protected void onResume() {
+    protected synchronized void onResume() {
         super.onResume();
         Log.e(TAG, "onResume");
         startBackgroundThread();
@@ -414,109 +472,81 @@ public class CameraActivity extends AppCompatActivity
         }
     }
     @Override
-    protected void onPause() {
+    protected synchronized void onPause() {
         super.onPause();
         Log.e(TAG, "onPause");
         closeCamera();
         stopBackgroundThread();
     }
 
-    /**
-     * Get the angle by which an image must be rotated given the device's current
-     * orientation.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private int getRotationCompensation(String cameraId, Activity activity, Context context)
-            throws CameraAccessException{
-        int result;
-        // Get the device's current rotation relative to its "native" orientation.
-        // Then, from the ORIENTATIONS table, look up the angle the image must be
-        // rotated to compensate for the device's rotation.
-        int deviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int rotationCompensation = ORIENTATIONS.get(deviceRotation);
 
-        // On most devices, the sensor orientation is 90 degrees, but for some
-        // devices it is 270 degrees. For devices with a sensor orientation of
-        // 270, rotate the image an additional 180 ((270 + 270) % 360) degrees.
-        CameraManager cameraManager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
-        int sensorOrientation = cameraManager
-                .getCameraCharacteristics(cameraId)
-                .get(CameraCharacteristics.SENSOR_ORIENTATION);
-        rotationCompensation = (rotationCompensation + sensorOrientation + 270) % 360;
 
-        // Return the corresponding FirebaseVisionImageMetadata rotation value.
-        switch (rotationCompensation) {
-            case 0:
-                result = FirebaseVisionImageMetadata.ROTATION_0;
-                break;
-            case 90:
-                result = FirebaseVisionImageMetadata.ROTATION_90;
-                break;
-            case 180:
-                result = FirebaseVisionImageMetadata.ROTATION_180;
-                break;
-            case 270:
-                result = FirebaseVisionImageMetadata.ROTATION_270;
-                break;
-            default:
-                result = FirebaseVisionImageMetadata.ROTATION_0;
-                Log.e(TAG, "Bad rotation value: " + rotationCompensation);
-        }
-        return result;
-    }
-
-    void labelObject(FirebaseVisionImage image) {
-        Log.i(TAG, "Registering model");
-        FirebaseLocalModel localModel = new FirebaseLocalModel.Builder("lab_model")
-                .setAssetFilePath("data/manifest.json")
-                .build();
-        FirebaseModelManager.getInstance().registerLocalModel(localModel);
-        FirebaseVisionOnDeviceAutoMLImageLabelerOptions labelerOptions =
-                new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
-                        .setLocalModelName("lab_model")
-                        .setConfidenceThreshold(0)  // Evaluate your model in the Firebase console
-                        .build();
-        try {
-            Log.i(TAG, "Labeling image");
-            FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions);
-            labeler.processImage(image)
-                    .addOnSuccessListener(labels -> {
-                        Log.i(TAG, "Succeeded");
-                        currentObject = labels.get(0).getText();
-                        Log.i(TAG, currentObject);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("OBJECT",currentObject);
-                        DialogFragment optionFragment = new OptionsDialog();
-                        optionFragment.setArguments(bundle);
-                        optionFragment.show(getSupportFragmentManager(), "optionsDialog");
-
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, e.getMessage());
-                        Toast.makeText(CameraActivity.this, "Unable to detect object", Toast.LENGTH_SHORT).show();
-                    });
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+    protected void fillBytes(final Image.Plane[] planes, final byte[][] yuvBytes) {
+        // Because of the variable row stride it's not possible to know in
+        // advance the actual necessary dimensions of the yuv planes.
+        for (int i = 0; i < planes.length; ++i) {
+            final ByteBuffer buffer = planes[i].getBuffer();
+            if (yuvBytes[i] == null) {
+                yuvBytes[i] = new byte[buffer.capacity()];
+            }
+            buffer.get(yuvBytes[i]);
         }
     }
 
-    public void detectText(FirebaseVisionImage image) {
-        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-        detector.processImage(image).addOnSuccessListener(firebaseVisionText -> processText(firebaseVisionText)).addOnFailureListener((@NonNull Exception e) -> {
-            //Nothing here
-        });
+    private Size chooseOptimalSize(final Size[] choices, final int width, final int height) {
+        final int minSize = Math.max(Math.min(width, height), MINIMUM_PREVIEW_SIZE);
+        final Size desiredSize = new Size(width, height);
+
+        // Collect the supported resolutions that are at least as big as the preview Surface
+        boolean exactSizeFound = false;
+        final List<Size> bigEnough = new ArrayList<Size>();
+        final List<Size> tooSmall = new ArrayList<Size>();
+        for (final Size option : choices) {
+            if (option.equals(desiredSize)) {
+                // Set the size but don't return yet so that remaining sizes will still be logged.
+                exactSizeFound = true;
+            }
+
+            if (option.getHeight() >= minSize && option.getWidth() >= minSize) {
+                bigEnough.add(option);
+            } else {
+                tooSmall.add(option);
+            }
+        }
+
+        if (exactSizeFound) {
+            return desiredSize;
+        }
+
+        // Pick the smallest of those, assuming we found any
+        if (bigEnough.size() > 0) {
+            final Size chosenSize = Collections.min(bigEnough, new CompareSizesByArea());
+            return chosenSize;
+        } else {
+            return choices[0];
+        }
     }
 
+    class CompareSizesByArea implements Comparator<Size> {
+        @Override
+        public int compare(final Size lhs, final Size rhs) {
+            // We cast here to ensure the multiplications won't overflow
+            return Long.signum(
+                    (long) lhs.getWidth() * lhs.getHeight() - (long) rhs.getWidth() * rhs.getHeight());
+        }
+    }
 
-    private void processText(FirebaseVisionText text) {
-        List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
-        if (blocks.size() == 0) {
-            return;
-        }
-        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
-            String txt = block.getText();
-            Log.e(TAG, txt);
-        }
+    private int getOrientation() {
+        return getWindowManager().getDefaultDisplay().getRotation() + sensorOrientation;
+    }
+
+    private void openDialog(String currentObject) {
+        Bundle bundle = new Bundle();
+        bundle.putString("OBJECT",currentObject);
+        DialogFragment optionFragment = new OptionsDialog();
+        optionFragment.setArguments(bundle);
+        optionFragment.show(getSupportFragmentManager(), "optionsDialog");
+
     }
 
 

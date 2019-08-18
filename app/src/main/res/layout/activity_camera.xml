@@ -6,7 +6,12 @@
     android:orientation="vertical"
     android:visibility="visible"
     tools:context="com.project.laborientation.CameraActivity">
-
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        />
     <TextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
