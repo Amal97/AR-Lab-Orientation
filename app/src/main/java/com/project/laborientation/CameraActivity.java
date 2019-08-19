@@ -40,7 +40,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
+import com.project.laborientation.Util.Classifier;
 import com.project.laborientation.Util.ImageUtils;
+import com.project.laborientation.Util.MSCognitiveServicesClassifier;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 

@@ -17,17 +17,15 @@
 * See the License for specific language governing permissions and limitations under the License.
 */
 
-package com.project.laborientation;
+package com.project.laborientation.Util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.widget.ImageView;
 
 
-import org.tensorflow.Operation;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import java.io.BufferedReader;
