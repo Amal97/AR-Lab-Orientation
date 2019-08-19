@@ -53,7 +53,8 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
-        <activity android:name=".InteractiveActivity" />
+        <activity android:name=".InteractiveActivity"
+            android:screenOrientation="userLandscape"/>
         <activity
             android:name=".LabRules"
             android:label="@string/title_activity_lab_rules"
