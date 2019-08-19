@@ -49,7 +49,7 @@ if not upload_result.is_batch_successful:
 
 print("Uploading multimeter")
 image_list = []
-for image_num in range(0, 39):
+for image_num in range(0, 55):
     file_name = "multimeter{}.jpg".format(image_num)
     with open(base_image_url + "images/multimeter/" + file_name, "rb") as image_contents:
         image_list.append(ImageFileCreateEntry(name=file_name, contents=image_contents.read(), tag_ids=[multimeter_tag.id]))
@@ -61,13 +61,22 @@ if not upload_result.is_batch_successful:
         if image.status != "OK":
             print(image.source_url)
 
-print("Uploading febe and waveform generator")
+print("Uploading waveform generator")
 image_list = []
 
-for image_num in range(0, 28):
+for image_num in range(0, 61):
     file_name = "waveformgenerator{}.jpg".format(image_num)
     with open(base_image_url + "images/waveformgenerator/" + file_name, "rb") as image_contents:
         image_list.append(ImageFileCreateEntry(name=file_name, contents=image_contents.read(), tag_ids=[waveformgenerator_tag.id]))
+
+upload_result = trainer.create_images_from_files(project.id, images=image_list)
+if not upload_result.is_batch_successful:
+    print("Image batch upload failed.")
+    for image in upload_result.images:
+        if image.status != "OK":
+            print(image.source_url)
+
+image_list = []
 
 for image_num in range(0, 17):
     file_name = "phoebe{}.jpg".format(image_num)
@@ -81,14 +90,3 @@ if not upload_result.is_batch_successful:
         if image.status != "OK":
             print(image.source_url)
 
-
-print ("Training...")
-iteration = trainer.train_project(project.id)
-while (iteration.status != "Completed"):
-    iteration = trainer.get_iteration(project.id, iteration.id)
-    print ("Training status: " + iteration.status)
-    time.sleep(1)
-
-# The iteration is now trained. Publish it to the project endpoint
-trainer.publish_iteration(project.id, iteration.id, publish_iteration_name, prediction_resource_id)
-print ("Done!")
