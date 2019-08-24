@@ -35,12 +35,9 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
 
         final EditText seekToText = findViewById(R.id.seek_to_text);
         Button seekToButton =  findViewById(R.id.seek_to_button);
-        seekToButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int skipToSecs = Integer.valueOf(seekToText.getText().toString());
-                player.seekToMillis(skipToSecs * 1000);
-            }
+        seekToButton.setOnClickListener((View v) -> {
+            int skipToSecs = Integer.valueOf(seekToText.getText().toString());
+            player.seekToMillis(skipToSecs * 1000);
         });
     }
 
