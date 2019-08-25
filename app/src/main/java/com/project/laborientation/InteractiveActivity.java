@@ -448,7 +448,7 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Enter", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffb63eb9":
+            case "ffb83dba":
                 Snackbar.make(interactiveLayout, "Freq", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -469,7 +469,11 @@ public class InteractiveActivity extends AppCompatActivity {
                         .show();
                 break;
             case "ffebe6c8":
-                Snackbar.make(interactiveLayout, "Enter", Snackbar.LENGTH_LONG)
+                Snackbar.make(interactiveLayout, "Shift", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff601e1f":
+                Snackbar.make(interactiveLayout, "Enter Number", Snackbar.LENGTH_LONG)
                         .show();
                 break;
         }
