@@ -151,15 +151,15 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Single", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffc3ff0c":
+            case "ffc4ff0d":
                 Snackbar.make(interactiveLayout, "Knob turning around", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ff0ed146":
+            case "ff0ed145":
                 Snackbar.make(interactiveLayout, "Cursors", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffb83cba":
+            case "ffb83dba":
                 Snackbar.make(interactiveLayout, "Acquire", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -171,7 +171,7 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Edge trigger", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffff0076":
+            case "ff024000":
                 Snackbar.make(interactiveLayout, "Mode coupling", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -187,7 +187,7 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Autoscale", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ff637099":
+            case "ff3f47cc":
                 Snackbar.make(interactiveLayout, "Save/Recall", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -195,7 +195,7 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Print", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ff627198":
+            case "ff00fdba":
                 Snackbar.make(interactiveLayout, "Utility", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -203,15 +203,15 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Pulsewidth", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ff000000":
+            case "ffff0076":
                 Snackbar.make(interactiveLayout, "Pattern", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffff0075":
+            case "ffffffff":
                 Snackbar.make(interactiveLayout, "More", Snackbar.LENGTH_LONG)
                         .show();
                 break;
-            case "ffce97ea":
+            case "ff63709a":
                 Snackbar.make(interactiveLayout, "Green and yellow", Snackbar.LENGTH_LONG)
                         .show();
                 break;
@@ -223,6 +223,46 @@ public class InteractiveActivity extends AppCompatActivity {
                 Snackbar.make(interactiveLayout, "Math", Snackbar.LENGTH_LONG)
                         .show();
                 break;
+            case "ff43929f":
+                Snackbar.make(interactiveLayout, "2", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffe05656":
+                Snackbar.make(interactiveLayout, "Label", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff601e1f":
+                Snackbar.make(interactiveLayout, "Up and down", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffc3c3c3":
+                Snackbar.make(interactiveLayout, "Probes", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff694545":
+                Snackbar.make(interactiveLayout, "External Trigger", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff434379":
+                Snackbar.make(interactiveLayout, "Probe compensation", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffebe6c8":
+                Snackbar.make(interactiveLayout, "USB", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff07074d":
+                Snackbar.make(interactiveLayout, "Intensity", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb0ff70":
+                Snackbar.make(interactiveLayout, "Power button", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff576f21":
+                Snackbar.make(interactiveLayout, "Options", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
             default:
                 break;
         }
@@ -230,6 +270,88 @@ public class InteractiveActivity extends AppCompatActivity {
     }
 
     private void handleMultimeter(String colorHex, LinearLayout interactiveLayout) {
+        switch (colorHex) {
+            case "ffffffff":
+                Snackbar.make(interactiveLayout, "Screen", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffc3c3c3":
+                Snackbar.make(interactiveLayout, "Power", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff585858":
+                Snackbar.make(interactiveLayout, "DC V", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff89001c":
+                Snackbar.make(interactiveLayout, "AC V", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffeb1c24":
+                Snackbar.make(interactiveLayout, "2 ohms", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffff7f26":
+                Snackbar.make(interactiveLayout, "Frequency", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffffca18":
+                Snackbar.make(interactiveLayout, "Cont", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffdeca6":
+                Snackbar.make(interactiveLayout, "Null", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffef200":
+                Snackbar.make(interactiveLayout, "Min/max", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffc4ff0d":
+                Snackbar.make(interactiveLayout, "<", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff0ed145":
+                Snackbar.make(interactiveLayout, ">", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff8cfffa":
+                Snackbar.make(interactiveLayout, "^", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff00a8f3":
+                Snackbar.make(interactiveLayout, "v", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff3f47cc":
+                Snackbar.make(interactiveLayout, "Auto/man", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb83dba":
+                Snackbar.make(interactiveLayout, "Single", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffeaec7":
+                Snackbar.make(interactiveLayout, "Shift", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb97b56":
+                Snackbar.make(interactiveLayout, "Hi/low", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fff8981d":
+                Snackbar.make(interactiveLayout, "Probes", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb7aadf":
+                Snackbar.make(interactiveLayout, "Terminal", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff601e1f":
+                Snackbar.make(interactiveLayout, "Fused", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+        }
 
     }
 
@@ -265,6 +387,92 @@ public class InteractiveActivity extends AppCompatActivity {
     }
 
     private void handleWaveformGenerator(String colorHex, LinearLayout interactiveLayout) {
+        switch (colorHex) {
+            case "ffffffff":
+                Snackbar.make(interactiveLayout, "^", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffc3c3c3":
+                Snackbar.make(interactiveLayout, "v", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff585858":
+                Snackbar.make(interactiveLayout, ">", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffe3bdd4":
+                Snackbar.make(interactiveLayout, "<", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff576f21":
+                Snackbar.make(interactiveLayout, "Probes?", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff89001c":
+                Snackbar.make(interactiveLayout, "Screen", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffff7f26":
+                Snackbar.make(interactiveLayout, "Knob", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffffca18":
+                Snackbar.make(interactiveLayout, "Power", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffdeca6":
+                Snackbar.make(interactiveLayout, "AM", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffef200":
+                Snackbar.make(interactiveLayout, "FM", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffc4ff0d":
+                Snackbar.make(interactiveLayout, "FSK", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff0ed145":
+                Snackbar.make(interactiveLayout, "Burst", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff8cfffa":
+                Snackbar.make(interactiveLayout, "Sweep", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff00a8f3":
+                Snackbar.make(interactiveLayout, "Arb", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ff3f47cc":
+                Snackbar.make(interactiveLayout, "Enter", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb63eb9":
+                Snackbar.make(interactiveLayout, "Freq", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fffeaec7":
+                Snackbar.make(interactiveLayout, "Ampl", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb97b56":
+                Snackbar.make(interactiveLayout, "Offset", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "fff8981d":
+                Snackbar.make(interactiveLayout, "Recall", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffb7aadf":
+                Snackbar.make(interactiveLayout, "Single", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+            case "ffebe6c8":
+                Snackbar.make(interactiveLayout, "Enter", Snackbar.LENGTH_LONG)
+                        .show();
+                break;
+        }
 
     }
 
