@@ -20,7 +20,7 @@ public class ARActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ar);
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
-        arFragment. setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
+        arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
             Anchor anchor = hitResult.createAnchor();
 
             ModelRenderable.builder().

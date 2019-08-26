@@ -70,7 +70,7 @@ import java.util.concurrent.CompletableFuture;
 
         private MSCognitiveServicesClassifier classifier;
         private CustomArFragment arFragment;
-        protected boolean computing = false;
+        protected boolean computing = true;
         protected byte[][] yuvBytes=new byte[3][];
         protected int yRowStride;
         protected int previewWidth = 0;
@@ -81,6 +81,7 @@ import java.util.concurrent.CompletableFuture;
         private static final int MINIMUM_PREVIEW_SIZE = 320;
         private String cameraId;
         private int sensorOrientation;
+        private Image image;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +89,9 @@ import java.util.concurrent.CompletableFuture;
             setContentView(R.layout.activity_image_ar);
 
             arFragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
-            arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+            arFragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            classifier = new MSCognitiveServicesClassifier(ImageArActivity.this);
             try {
                 cameraId = manager.getCameraIdList()[0];
                 CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
@@ -107,7 +109,7 @@ import java.util.concurrent.CompletableFuture;
                 yuvBytes = new byte[3][];
                 sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             } catch (CameraAccessException e) {
-                Log.e("ArActivity", e.getMessage());
+                Log.e("TestActivity", e.getMessage());
             }
 
         }
@@ -131,76 +133,72 @@ import java.util.concurrent.CompletableFuture;
 
         @Override
         public void onUpdate(FrameTime frameTime) {
-            Log.e("ImageArActivity", "ON UPDATE");
             Frame frame = arFragment.getArSceneView().getArFrame();
             Collection<AugmentedImage> images = frame.getUpdatedTrackables(AugmentedImage.class);
 
-            imageReader = ImageReader.newInstance(previewWidth, previewHeight, ImageFormat.YUV_420_888, 2);
-            ImageReader.OnImageAvailableListener readerListener = (reader) -> {
-                Image image = null;
-                //We need wait until we have some size from onPreviewSizeChosen
-                if (previewWidth == 0 || previewHeight == 0) {
+            image = null;
+            //We need wait until we have some size from onPreviewSizeChosen
+            if (previewWidth == 0 || previewHeight == 0) {
+                return;
+            }
+
+            rgbBytes = new int[previewWidth * previewHeight];
+
+            try {
+                image = frame.acquireCameraImage();
+
+                if (image == null) {
+                    Log.e("ImageArActivity", "No image");
                     return;
                 }
 
-                rgbBytes = new int[previewWidth * previewHeight];
-
-                try {
-                    Log.e("ImageArActivity", "AMAL");
-                    image = arFragment.getArSceneView().getArFrame().acquireCameraImage();
-
-                    if (image == null) {
-
-                        return;
-                    }
-
-                    if (!computing) {
-                        image.close();
-                        return;
-                    }
-                    Trace.beginSection("imageAvailable");
-                    final Image.Plane[] planes = image.getPlanes();
-                    fillBytes(planes, yuvBytes);
-                    yRowStride = planes[0].getRowStride();
-                    final int uvRowStride = planes[1].getRowStride();
-                    final int uvPixelStride = planes[1].getPixelStride();
-
-                    ImageUtils.convertYUV420ToARGB8888(
-                            yuvBytes[0],
-                            yuvBytes[1],
-                            yuvBytes[2],
-                            previewWidth,
-                            previewHeight,
-                            yRowStride,
-                            uvRowStride,
-                            uvPixelStride,
-                            rgbBytes);
-
+                if (!computing) {
                     image.close();
-                    rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
-
-
-                    Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
-
-                    if (r.getConfidence() > 0.7) {
-                        if(images.isEmpty()){
-                            Log.e("ImageArActivity", "im empty");
-                        }
-                        else{
-                            Log.e("ImageArActivity", "NOT empty");
-
-                        }
-                        computing = false;
-                    }
-                } catch (final Exception e) {
-                    if (image != null) {
-                        image.close();
-                    }
-                    Trace.endSection();
                     return;
                 }
-                Trace.endSection();
-            };
+                final Image.Plane[] planes = image.getPlanes();
+                fillBytes(planes, yuvBytes);
+                yRowStride = planes[0].getRowStride();
+                final int uvRowStride = planes[1].getRowStride();
+                final int uvPixelStride = planes[1].getPixelStride();
+
+                ImageUtils.convertYUV420ToARGB8888(
+                        yuvBytes[0],
+                        yuvBytes[1],
+                        yuvBytes[2],
+                        previewWidth,
+                        previewHeight,
+                        yRowStride,
+                        uvRowStride,
+                        uvPixelStride,
+                        rgbBytes);
+
+                image.close();
+                rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
+
+
+                Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
+
+                Log.e("ImageArActivity", r.getTitle());
+                Log.e("ImageArActivity", r.getId());
+
+                if (r.getConfidence() > 0.7) {
+                    images.size();
+//                    if(images. isEmpty()){
+//                        Log.e("ImageArActivity", "im empty");
+//                    }
+//                    else{
+//                        Log.e("ImageArActivity", "NOT empty");
+//
+//                    }
+                    //computing = false;
+                }
+            } catch (final Exception e) {
+                Log.e("ImageArActivity", e.toString());
+                if (image != null) {
+                    image.close();
+                }
+            }
 
 
 

@@ -8,7 +8,7 @@ public class CustomArFragment extends ArFragment {
 
     @Override
     protected Config getSessionConfiguration(Session session) {
-        getPlaneDiscoveryController().setInstructionView(null);
+        //getPlaneDiscoveryController().setInstructionView(null);
 
         Config config = new Config(session);
         config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
@@ -17,7 +17,7 @@ public class CustomArFragment extends ArFragment {
 
         getArSceneView().setupSession(session);
 
-     //   ((ImageArActivity) getActivity()).setupDatabase(config, session);
+        //((ImageArActivity) getActivity()).setupDatabase(config, session);
 
         return config;
     }
