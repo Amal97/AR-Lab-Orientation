@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentBottom="false"
+    android:orientation="vertical"
+    android:scaleX="0.75"
+    android:scaleY="0.75">
 
-    <TextView
-        android:id="@+id/POWER_SUPPLY"
-        android:layout_width="wrap_content"
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="79dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_weight="1"
         android:orientation="vertical"
-        android:text="Power Socket, AUS/NZ, "
-        android:textSize="5sp" />
+        android:text="POWER SUPPLY"
+        android:textColor="@android:color/black"
+        android:textSize="8sp" />
 </RelativeLayout>

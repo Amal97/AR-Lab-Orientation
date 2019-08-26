@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             }
         );
         model_placement.setOnClickListener((View view) -> {
-                Intent modelPlacementIntent = new Intent(getBaseContext(), ARActivity.class);
+                Intent modelPlacementIntent = new Intent(getBaseContext(), FindLecturersActivity.class);
                 startActivity(modelPlacementIntent);
             }
         );
