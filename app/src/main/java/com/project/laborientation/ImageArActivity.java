@@ -1,6 +1,7 @@
 package com.project.laborientation;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -21,6 +22,7 @@ import android.os.Trace;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 //import android.transition.Scene;
@@ -82,6 +84,8 @@ import java.util.concurrent.CompletableFuture;
         private String cameraId;
         private int sensorOrientation;
         private Image image;
+
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -182,16 +186,24 @@ import java.util.concurrent.CompletableFuture;
                 Log.e("ImageArActivity", r.getTitle());
                 Log.e("ImageArActivity", r.getId());
 
+
                 if (r.getConfidence() > 0.7) {
-                    images.size();
-//                    if(images. isEmpty()){
-//                        Log.e("ImageArActivity", "im empty");
-//                    }
-//                    else{
-//                        Log.e("ImageArActivity", "NOT empty");
-//
-//                    }
-                    //computing = false;
+                    arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
+                        Anchor anchor = hitResult.createAnchor();
+
+                        if(r.getTitle().equals("powersupply")) {
+                            ViewRenderable.builder()
+                                    .setView(this, R.layout.power_supply_view)
+                                    .build()
+                                    .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                        }
+                        else if(r.getTitle().equals("oscilloscope")){
+                            ViewRenderable.builder()
+                                    .setView(this, R.layout.oscilliscope_view)
+                                    .build()
+                                    .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                        }
+                    }));
                 }
             } catch (final Exception e) {
                 Log.e("ImageArActivity", e.toString());
@@ -199,80 +211,7 @@ import java.util.concurrent.CompletableFuture;
                     image.close();
                 }
             }
-
-
-
-
-
-            //    try (Image i = frame.acquireCameraImage()) {
-            //    FirebaseVisionImage firebaseImage = FirebaseVisionImage.fromMediaImage(i, 0);
-            //   labelObject(firebaseImage);
-
-
-//        } catch (NotYetAvailableException e) {
-//            e.printStackTrace();
-//        }
-
-
-//            for(AugmentedImage image : images){
-//                if(image.getTrackingState() == TrackingState.TRACKING){
-//                    if(image.getName().equals("fox")){
-//                        Anchor anchor = image.createAnchor(image.getCenterPose());
-//                        createModel(anchor, "fox");
-//                    }
-//                    if(image.getName().equals("waveform")){
-//                        Anchor anchor = image.createAnchor(image.getCenterPose());
-//                        createModel(anchor, "waveform");
-//                    }
-//                    if(image.getName().equals("socket")){
-//                        Anchor anchor = image.createAnchor(image.getCenterPose());
-//                        createModel(anchor, "socket");
-//                    }
-//
-//                }
-//            }
         }
-
-        String oldObject;
-
-//        void labelObject(FirebaseVisionImage image) {
-//            FirebaseLocalModel localModel = new FirebaseLocalModel.Builder("lab_model")
-//                    .setAssetFilePath("data/manifest.json")
-//                    .build();
-//            FirebaseModelManager.getInstance().registerLocalModel(localModel);
-//            FirebaseVisionOnDeviceAutoMLImageLabelerOptions labelerOptions =
-//                    new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
-//                            .setLocalModelName("lab_model")
-//                            .setConfidenceThreshold(0)  // Evaluate your model in the Firebase console
-//                            .build();
-//            try {
-//                FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions);
-//                labeler.processImage(image)
-//                        .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
-//                            @Override
-//                            public void onSuccess(List<FirebaseVisionImageLabel> labels) {
-//                                String currentObject = labels.get(0).getText();
-//                                if((oldObject == null) || (oldObject != currentObject)) {
-//                                    oldObject = currentObject;
-//                                    Bundle bundle = new Bundle();
-//                                    bundle.putString("OBJECT", currentObject);
-//                                    DialogFragment optionFragment = new OptionsDialog();
-//                                    optionFragment.setArguments(bundle);
-//                                    optionFragment.show(getSupportFragmentManager(), "optionsDialog");
-//
-//                                    Toast.makeText(ImageArActivity.this, "FOUND", Toast.LENGTH_SHORT).show();
-//                                }
-//                            }
-//                        })
-//                        .addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Toast.makeText(ImageArActivity.this, "Unable to detect object", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//            } catch (Exception e) {
-//            }
-//        }
 
         protected void fillBytes(final Image.Plane[] planes, final byte[][] yuvBytes) {
             // Because of the variable row stride it's not possible to know in
@@ -288,26 +227,10 @@ import java.util.concurrent.CompletableFuture;
 
         private void createModel(Anchor anchor, String object) {
 
-
-            if(object == "fox") {
-                ViewRenderable.builder()
+             ViewRenderable.builder()
                         .setView(this, R.layout.ar_text)
                         .build()
                         .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
-            }
-
-            if(object == "waveform") {
-                ViewRenderable.builder()
-                        .setView(this, R.layout.ar_text)
-                        .build()
-                        .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
-            }
-            if(object == "socket") {
-                ViewRenderable.builder()
-                        .setView(this, R.layout.ar_text)
-                        .build()
-                        .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
-            }
 
         }
 
@@ -343,6 +266,15 @@ import java.util.concurrent.CompletableFuture;
             } else {
                 return choices[0];
             }
+        }
+
+        private void addModelToScene(Anchor anchor, ModelRenderable modelRenderable) {
+            AnchorNode anchorNode = new AnchorNode(anchor);
+            TransformableNode transformableNode = new TransformableNode(arFragment.getTransformationSystem());
+            transformableNode.setParent(anchorNode);
+            transformableNode.setRenderable(modelRenderable);
+            arFragment.getArSceneView().getScene().addChild(anchorNode);
+            transformableNode.select();
         }
 
 

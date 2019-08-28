@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:text="POWER SUPPLY"
+        android:text="OSCILLISCOPE"
         android:textColor="@android:color/black"
         android:textSize="8sp" />
 </RelativeLayout>

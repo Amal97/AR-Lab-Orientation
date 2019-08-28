@@ -22,6 +22,7 @@
         android:roundIcon="@drawable/multimeter"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AR_Text"></activity>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -54,8 +55,9 @@
         <activity android:name=".FindLecturersActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
-        <activity android:name=".InteractiveActivity"
-            android:screenOrientation="userLandscape"/>
+        <activity
+            android:name=".InteractiveActivity"
+            android:screenOrientation="userLandscape" />
         <activity
             android:name=".LabRules"
             android:label="@string/title_activity_lab_rules"
