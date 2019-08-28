@@ -70,7 +70,7 @@ import java.util.List;
 public class FindLecturersActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "CameraActivity";
+    private static final String TAG = "FindLecturersActivity";
     private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {

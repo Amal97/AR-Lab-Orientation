@@ -51,6 +51,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".FindLecturersActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
         <activity android:name=".InteractiveActivity"
