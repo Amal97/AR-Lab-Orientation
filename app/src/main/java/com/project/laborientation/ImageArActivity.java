@@ -74,7 +74,7 @@ import java.util.concurrent.CompletableFuture;
 
         private MSCognitiveServicesClassifier classifier;
         private CustomArFragment arFragment;
-        protected boolean computing = true;
+        protected boolean computing = false;
         protected byte[][] yuvBytes=new byte[3][];
         protected int yRowStride;
         protected int previewWidth = 0;
@@ -159,10 +159,11 @@ import java.util.concurrent.CompletableFuture;
                     return;
                 }
 
-                if (!computing) {
+                if (computing) {
                     image.close();
                     return;
                 }
+                computing = true;
                 final Image.Plane[] planes = image.getPlanes();
                 fillBytes(planes, yuvBytes);
                 yRowStride = planes[0].getRowStride();
@@ -208,7 +209,8 @@ import java.util.concurrent.CompletableFuture;
                                                 .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
                                     }
                                 }));
-                        }
+                            }
+                            computing = false;
 
                 });
             } catch (final Exception e) {
@@ -285,6 +287,7 @@ import java.util.concurrent.CompletableFuture;
 
         @Override
         public synchronized void onPause() {
+            finish();
             handlerThread.quitSafely();
             try {
                 handlerThread.join();
