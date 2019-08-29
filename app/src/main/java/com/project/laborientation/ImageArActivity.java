@@ -18,6 +18,8 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Trace;
 import android.util.Log;
 import android.util.Size;
@@ -84,7 +86,8 @@ import java.util.concurrent.CompletableFuture;
         private String cameraId;
         private int sensorOrientation;
         private Image image;
-
+        private Handler handler;
+        private HandlerThread handlerThread;
 
 
         @Override
@@ -180,31 +183,34 @@ import java.util.concurrent.CompletableFuture;
                 image.close();
                 rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
 
+                runInBackground(
+                        () -> {
+                            Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
 
-                Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
-
-                Log.e("ImageArActivity", r.getTitle());
-                Log.e("ImageArActivity", r.getId());
+                            Log.e("ImageArActivity", r.getTitle());
+                            Log.e("ImageArActivity", r.getId());
 
 
-                if (r.getConfidence() > 0.7) {
-                    arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
-                        Anchor anchor = hitResult.createAnchor();
+                            if (r.getConfidence() > 0.7) {
+                                arFragment.setOnTapArPlaneListener(((hitResult, plane, motionEvent) -> {
+                                    Anchor anchor = hitResult.createAnchor();
 
-                        if(r.getTitle().equals("powersupply")) {
-                            ViewRenderable.builder()
-                                    .setView(this, R.layout.power_supply_view)
-                                    .build()
-                                    .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    if(r.getTitle().equals("powersupply")) {
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.power_supply_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                    else if(r.getTitle().equals("oscilloscope")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.oscilliscope_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                }));
                         }
-                        else if(r.getTitle().equals("oscilloscope")){
-                            ViewRenderable.builder()
-                                    .setView(this, R.layout.oscilliscope_view)
-                                    .build()
-                                    .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
-                        }
-                    }));
-                }
+
+                });
             } catch (final Exception e) {
                 Log.e("ImageArActivity", e.toString());
                 if (image != null) {
@@ -265,6 +271,35 @@ import java.util.concurrent.CompletableFuture;
                 return chosenSize;
             } else {
                 return choices[0];
+            }
+        }
+
+        @Override
+        public synchronized void onResume() {
+            super.onResume();
+
+            handlerThread = new HandlerThread("inference");
+            handlerThread.start();
+            handler = new Handler(handlerThread.getLooper());
+        }
+
+        @Override
+        public synchronized void onPause() {
+            handlerThread.quitSafely();
+            try {
+                handlerThread.join();
+                handlerThread = null;
+                handler = null;
+            } catch (final InterruptedException e) {
+                Log.e("ImageArActivity", e.getMessage());
+            }
+
+            super.onPause();
+        }
+
+        protected synchronized void runInBackground(final Runnable r) {
+            if (handler != null) {
+                handler.post(r);
             }
         }
 
