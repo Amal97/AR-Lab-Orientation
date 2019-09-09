@@ -208,6 +208,18 @@ import java.util.concurrent.CompletableFuture;
                                                 .build()
                                                 .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
                                     }
+                                    else if(r.getTitle().equals("multimeter")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.multimeter_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                    else if(r.getTitle().equals("waveformgenerator")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.waveform_generator_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
                                 }));
                             }
                             computing = false;

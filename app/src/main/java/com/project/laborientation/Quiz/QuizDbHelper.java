@@ -157,41 +157,75 @@ public class QuizDbHelper extends SQLiteOpenHelper {
     }
 
     private void fillQuestionsTable(){
-        Question q1 = new Question("Oscilloscope, A is correct", "A", "B", "C", 1,
+        Question q1 = new Question("Typically oscilloscope represents ____", "current and time", "resistance and time", "voltage and time", 3,
                 Category.OSCILLOSCOPE);
         addQuestion(q1);
-        Question q2 = new Question("Oscilloscope, B is correct", "A", "B", "C", 2,
+        Question q2 = new Question("What display control(s) need to be adjusted on the oscilloscope in order to show fewer cycles of this signal on the screen, with a greater height (amplitude)? ",
+                "The “timebase” control needs to be adjusted for fewer seconds per division, while the “vertical” control needs to be adjusted for fewer volts per division",
+                "The “timebase” control needs to be adjusted for more seconds per division, while the “vertical” control needs to be adjusted for fewer volts per division",
+                "The “timebase” control needs to be adjusted for fewer seconds per division, while the “horizontal” control needs to be adjusted for fewer volts per division", 1,
                 Category.OSCILLOSCOPE);
         addQuestion(q2);
-        Question q3 = new Question("MULTIMETER, C is correct", "A", "B", "C", 3,
-                Category.MULTIMETER);
+        Question q3 = new Question("What display control(s) need to be adjusted on the oscilloscope in order to show a normal-looking wave on the screen? ",
+                "The “horizontal” control needs to be adjusted for a greater number of volts per division",
+                "The “vertical” control needs to be adjusted for a greater number of volts per division.",
+                "The “vertical” control needs to be adjusted for a lower number of volts per division.", 2,
+                Category.OSCILLOSCOPE);
         addQuestion(q3);
-        Question q4 = new Question("MULTIMETER, A is correct", "A", "B", "C", 1,
+        Question q4 = new Question("Digital multimeter is used for _____",
+                "Measuring a.c. and d.c. current, voltage and resistance",
+                "Measuring a.c. current and voltage",
+                "Measuring d.c. current and resistance", 1,
                 Category.MULTIMETER);
         addQuestion(q4);
-        Question q5 = new Question("POWER_SUPPLY, B is correct", "A", "B", "C", 2,
-                Category.POWER_SUPPLY);
+        Question q5 = new Question("Quantities are digitised using _____",
+                "D/A converter",
+                "Amplifier",
+                "A/D converter", 3,
+                Category.MULTIMETER);
         addQuestion(q5);
-        Question q6 = new Question("POWER_SUPPLY, C is correct", "A", "B", "C", 3,
-                Category.POWER_SUPPLY);
+        Question q6 = new Question("Current is converted to voltage ____",
+                "Through a voltmeter",
+                "Through a resistance",
+                "Through an ammeter", 2,
+                Category.MULTIMETER);
         addQuestion(q6);
-        Question q7 = new Question("WAVEFORM_GENERATOR, A is correct", "A", "B", "C", 1,
-                Category.WAVEFORM_GENERATOR);
+        Question q7 = new Question("How to set the max current limit in a power supply?",
+                "By turning the current knob",
+                "You can't change the current limit",
+                "Short the clips and then turn the knob",
+                3,
+                Category.POWER_SUPPLY);
         addQuestion(q7);
-        Question q8 = new Question("WAVEFORM_GENERATOR, B is correct", "A", "B", "C", 2,
-                Category.WAVEFORM_GENERATOR);
+        Question q8 = new Question("How to put the power supply in parallel mode?",
+                "Have the slave switch left and the master switch left",
+                "Have the slave switch right and the master switch right",
+                "Have the slave switch right and the master switch left ", 2,
+                Category.POWER_SUPPLY);
         addQuestion(q8);
-        Question q9 = new Question("When was Phoebe born?", "20/05/2011", "20/02/2011", "02/20/2011", 2,
-                Category.PHOEBE);
+        Question q9 = new Question("What's the difference between Master and Slave voltage?",
+                "There is no difference",
+                "When power supply is in parallel or series the slave follows the master voltage",
+                "The voltage is independent when the power supply is in series", 2,
+                Category.POWER_SUPPLY);
         addQuestion(q9);
-        Question q10 = new Question("What breed is Phoebe?", "Beagle", "Jack Russell", "Fox Terrier", 2,
-                Category.PHOEBE);
+        Question q10 = new Question("Describe a square wave?",
+                "A voltage that switches between two fixed voltage levels at regular intervals",
+                "A wave in which the voltage exhibits symmetrical rise and fall times",
+                "A type of sine wave that increases in frequency over some period of time", 1,
+                Category.WAVEFORM_GENERATOR);
         addQuestion(q10);
-        Question q11 = new Question("Which of these tricks can Phoebe NOT do?", "Handshake", "Sit", "Heel", 3,
-                Category.PHOEBE);
+        Question q11 = new Question("What is Rise Time?",
+                "Amount of time required for a pulse edge to make a transition to a state opposite its current level; in the case of rise time, from low level to high level and, in the case of fall time, from high level to low level",
+                "The difference in timing between two otherwise similar signals",
+                "The amount of time it takes a wave to complete one cycle", 1,
+                Category.WAVEFORM_GENERATOR);
         addQuestion(q11);
-        Question q12 = new Question("How old is Phoebe?", "8", "5", "2", 1,
-                Category.PHOEBE);
+        Question q12 = new Question("What is period?",
+                "The number of times a signal repeats in one second",
+                "The amount of time it takes a wave to complete one cycle",
+                "The amount of time that passes from the beginning of a cycle to the beginning of the next cycle", 2,
+                Category.WAVEFORM_GENERATOR);
         addQuestion(q12);
     }
 
