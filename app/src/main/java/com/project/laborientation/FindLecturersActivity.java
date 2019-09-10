@@ -420,6 +420,7 @@ public class FindLecturersActivity extends AppCompatActivity
         Log.e(TAG, "onPause");
         closeCamera();
         stopBackgroundThread();
+        finish();
     }
 
     /**
