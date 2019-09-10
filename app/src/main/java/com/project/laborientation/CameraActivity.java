@@ -2,6 +2,7 @@ package com.project.laborientation;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -34,6 +35,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -152,6 +154,25 @@ public class CameraActivity extends AppCompatActivity
             }
         };
 
+        displayTutorial();
+
+    }
+
+
+
+    public void displayTutorial(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Aim the camera at the equipment and then take a photo")
+                .setTitle("Tutorial");
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 
 

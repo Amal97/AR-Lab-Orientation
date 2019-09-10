@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -95,6 +96,8 @@ import java.util.concurrent.CompletableFuture;
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_image_ar);
 
+            displayTutorial();
+            
             arFragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
             arFragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
@@ -121,21 +124,20 @@ import java.util.concurrent.CompletableFuture;
 
         }
 
-        public void setupDatabase(Config config, Session session){
-            Bitmap foxBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fox);
-            Bitmap waveformBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.waveform);
-            Bitmap socketBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.socket);
+        public void displayTutorial(){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            AugmentedImageDatabase aid = new AugmentedImageDatabase(session);
-            aid.addImage("fox", foxBitmap);
-            aid.addImage("waveform", waveformBitmap);
-            aid.addImage("socket", socketBitmap);
+            builder.setMessage("Aim the camera at an equipment and then click on a flat surface for AR text to overlay")
+                    .setTitle("Tutorial");
 
-            config.setAugmentedImageDatabase(aid);
+            builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+
+            builder.show();
         }
-
-
-
 
 
         @Override
@@ -245,15 +247,6 @@ import java.util.concurrent.CompletableFuture;
             }
         }
 
-        private void createModel(Anchor anchor, String object) {
-
-             ViewRenderable.builder()
-                        .setView(this, R.layout.ar_text)
-                        .build()
-                        .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
-
-        }
-
         private Size chooseOptimalSize(final Size[] choices, final int width, final int height) {
             final int minSize = Math.max(Math.min(width, height), MINIMUM_PREVIEW_SIZE);
             final Size desiredSize = new Size(width, height);
@@ -318,15 +311,6 @@ import java.util.concurrent.CompletableFuture;
             }
         }
 
-        private void addModelToScene(Anchor anchor, ModelRenderable modelRenderable) {
-            AnchorNode anchorNode = new AnchorNode(anchor);
-            TransformableNode transformableNode = new TransformableNode(arFragment.getTransformationSystem());
-            transformableNode.setParent(anchorNode);
-            transformableNode.setRenderable(modelRenderable);
-            arFragment.getArSceneView().getScene().addChild(anchorNode);
-            transformableNode.select();
-        }
-
 
         private void placeModel(ViewRenderable modelRenderable, Anchor anchor) {
 
@@ -343,13 +327,8 @@ import java.util.concurrent.CompletableFuture;
             node.setRenderable(modelRenderable);
 
             node.select();
-
-//        anchorNode.setLocalRotation(Quaternion.axisAngle(new Vector3 (1, 0, 0), 90f));
-//
-//        anchorNode.setRenderable(modelRenderable);
-//        arFragment.getArSceneView().getScene().addChild(anchorNode);
-
         }
+
         class CompareSizesByArea implements Comparator<Size> {
             @Override
             public int compare(final Size lhs, final Size rhs) {

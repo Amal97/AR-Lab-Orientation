@@ -3,6 +3,7 @@ package com.project.laborientation;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -34,6 +35,7 @@ import android.view.TextureView;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -106,6 +108,8 @@ public class FindLecturersActivity extends AppCompatActivity
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = findViewById(R.id.btn_takepicture);
+
+        displayTutorial();
         takePictureButton.setOnClickListener((View v) ->
                 takePicture());
 
@@ -141,6 +145,21 @@ public class FindLecturersActivity extends AppCompatActivity
             }
         };
 
+    }
+
+    public void displayTutorial(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Aim the camera at the name of the staff and then take a photo")
+                .setTitle("Tutorial");
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 
     @Override

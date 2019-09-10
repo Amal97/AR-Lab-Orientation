@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
@@ -11,8 +12,7 @@
         android:contentDescription="clockTower"
         android:src="@drawable/clock_tower" />
     <LinearLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+        android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:paddingLeft="20dp"
-        android:paddingTop="30dp"
+        android:paddingTop="100dp"
         android:paddingRight="20dp"
         android:textColor="#000"
         android:fontFamily="@font/roboto_light"
@@ -30,84 +30,68 @@
         app:charIncrease="1"
         app:typerSpeed="100" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/identify_equipment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="80dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="@font/open_sans_bold"
-        android:padding="15dp"
-        android:text="Identify Equipment"
-        android:textColor="#000"
-        android:textSize="15sp"
-        app:icon="@drawable/ic_baseline_search_24px"
-        app:iconTint="#000" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/identify_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="80dp"
+            android:background="@color/colorAccent"
+            android:fontFamily="@font/open_sans_bold"
+            android:padding="15dp"
+            android:text="Identify Equipment"
+            android:textColor="#000"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_baseline_search_24px"
+            app:iconTint="#000" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/health_safety"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="80dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="@font/open_sans_bold"
-        android:padding="15dp"
-        android:text="Health and Safety"
-        android:textColor="#000"
-        android:textSize="15sp"
-        app:icon="@drawable/ic_round_warning_24px"
-        app:iconTint="#000" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/model_placement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="80dp"
+            android:background="@color/colorAccent"
+            android:fontFamily="@font/open_sans_bold"
+            android:padding="15dp"
+            android:text="People Information"
+            android:textColor="#000"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_outline_place_24px"
+            app:iconTint="#000" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/interactive_equipment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="80dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="@font/open_sans_bold"
-        android:padding="15dp"
-        android:text="Interactive Equipment"
-        android:textColor="#000"
-        android:textSize="15sp"
-        app:icon="@drawable/ic_outline_label_24px"
-        app:iconTint="#000" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/interactive_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="80dp"
+            android:background="@color/colorAccent"
+            android:fontFamily="@font/open_sans_bold"
+            android:padding="15dp"
+            android:text="Interactive Equipment"
+            android:textColor="#000"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_outline_label_24px"
+            app:iconTint="#000" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/model_placement"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="80dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="@font/open_sans_bold"
-        android:padding="15dp"
-        android:text="People Information"
-        android:textColor="#000"
-        android:textSize="15sp"
-        app:icon="@drawable/ic_outline_place_24px"
-        app:iconTint="#000" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="80dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="@font/open_sans_bold"
-        android:padding="15dp"
-        android:text="Logout"
-        android:textColor="#000"
-        android:textSize="15sp"
-        app:icon="@drawable/ic_outline_exit_to_app_24px"
-        app:iconTint="#000" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="80dp"
+            android:background="@color/colorAccent"
+            android:fontFamily="@font/open_sans_bold"
+            android:padding="15dp"
+            android:text="Logout"
+            android:textColor="#000"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_outline_exit_to_app_24px"
+            app:iconTint="#000" />
 </LinearLayout>
 </FrameLayout>
