@@ -390,6 +390,7 @@ public class FindLecturersActivity extends AppCompatActivity
             imageReader.close();
             imageReader = null;
         }
+        finish();
     }
 
     //TODO: See if you can request camera permission outside of this activity? Would simplify if can do it in main activity
