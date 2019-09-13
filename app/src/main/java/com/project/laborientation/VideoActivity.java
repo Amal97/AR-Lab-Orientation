@@ -21,6 +21,8 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
     private MyPlayerStateChangeListener playerStateChangeListener;
     private MyPlaybackEventListener playbackEventListener;
     private YouTubePlayer player;
+    private String categoryName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,9 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
 
         youTubeView = findViewById(R.id.youtube_view);
         youTubeView.initialize(Config.YOUTUBE_API_KEY, this);
+
+        Intent intent = getIntent();
+        categoryName = intent.getStringExtra(CameraActivity.EXTRA_CATEGORY_Name).toLowerCase();
 
         playerStateChangeListener = new MyPlayerStateChangeListener();
         playbackEventListener = new MyPlaybackEventListener();
@@ -48,7 +53,23 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
         player.setPlaybackEventListener(playbackEventListener);
 
         if (!wasRestored) {
-            player.cueVideo("lkeW8ZmnnK0"); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
+            switch (categoryName) {
+                case "oscilloscope":
+                    player.cueVideo("u4zyptPLlJI");
+                    break;
+                case "power supply":
+                    player.cueVideo("T8Z2EFrbtpU");
+                    break;
+                case "waveform generator":
+                    player.cueVideo("mLKPwWGBtIw");
+                    break;
+                case "multimeter":
+                    player.cueVideo("yvxQcrNzG5U");
+                    break;
+                default:
+                    player.cueVideo("lkeW8ZmnnK0"); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
+                    break;
+            }
         }
     }
 

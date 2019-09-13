@@ -14,11 +14,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.project.laborientation.Quiz.Category;
 import com.project.laborientation.Quiz.Question;
 import com.project.laborientation.Quiz.QuizDbHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
     public static final String EXTRA_SCORE = "extraScore";
@@ -133,6 +135,11 @@ public class QuizActivity extends AppCompatActivity {
         }
         else{
             dbHelper.addCorectAnswers(categoryID, score);
+            List<Category> mDataset = dbHelper.getCategoryScores();
+            int correctAnswers = 0;
+            for (Category data: mDataset) {
+                correctAnswers = correctAnswers + data.getScore();
+            }
             finishQuiz();
         }
     }
