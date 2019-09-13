@@ -5,8 +5,6 @@ public class Category {
     public static final int MULTIMETER = 2;
     public static final int POWER_SUPPLY = 3;
     public static final int WAVEFORM_GENERATOR = 4;
-    public static final int PHOEBE = 5;
-
 
     private int id;
     private String name;

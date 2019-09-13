@@ -114,8 +114,6 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         addQuestionTracker(tracker3);
         QuizTracker tracker4 = new QuizTracker(Category.WAVEFORM_GENERATOR, "Waveform Generator", c4_counter);
         addQuestionTracker(tracker4);
-        QuizTracker tracker5 = new QuizTracker(Category.PHOEBE, "Phoebe", c5_counter);
-        addQuestionTracker(tracker5);
     }
 
     private void addQuestionTracker(QuizTracker tracker){
@@ -251,10 +249,6 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         if(question.getCategoryID() == 4){
             c4_counter++;
         }
-        if(question.getCategoryID() == 5){
-            c5_counter++;
-        }
-
     }
 
     public Category getCategory(int id){
