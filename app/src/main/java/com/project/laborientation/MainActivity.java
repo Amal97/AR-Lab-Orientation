@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         Button identify_equipment = findViewById(R.id.identify_equipment);
         Button interactive_equipment = findViewById(R.id.interactive_equipment);
         Button model_placement = findViewById(R.id.model_placement);
+        Button rules = findViewById(R.id.rules);
         Button logout = findViewById(R.id.logout);
         HTextView helloText = findViewById(R.id.hello);
         String name;
@@ -49,10 +50,17 @@ public class MainActivity extends AppCompatActivity {
             }
         );
         model_placement.setOnClickListener((View view) -> {
-                Intent modelPlacementIntent = new Intent(getBaseContext(), FindLecturer_text_input.class);
-                startActivity(modelPlacementIntent);
-            }
+                    Intent modelPlacementIntent = new Intent(getBaseContext(), FindLecturer_text_input.class);
+                    startActivity(modelPlacementIntent);
+                }
         );
+
+        rules.setOnClickListener((View view) -> {
+                    Intent rulesIntent = new Intent(getBaseContext(), Rules.class);
+                    startActivity(rulesIntent);
+                }
+        );
+
         logout.setOnClickListener((View view) -> {
                     LoginManager.getInstance().logOut();
                     Intent LoginIntent = new Intent(getBaseContext(), LoginActivity.class);
