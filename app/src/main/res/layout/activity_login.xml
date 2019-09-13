@@ -44,6 +44,7 @@
         android:text="Login as a guest"
         android:textColor="#000"
         android:textSize="15sp"
+        android:backgroundTint="#E0F2F1"
         app:iconTint="#000" />
 </LinearLayout>
 </FrameLayout>

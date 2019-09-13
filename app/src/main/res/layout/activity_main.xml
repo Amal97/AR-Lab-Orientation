@@ -37,12 +37,13 @@
             android:layout_marginLeft="80dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="80dp"
-            android:background="@color/colorAccent"
+            android:background="#E0F2F1"
             android:fontFamily="@font/open_sans_bold"
             android:padding="15dp"
             android:text="Identify Equipment"
             android:textColor="#000"
             android:textSize="15sp"
+            app:backgroundTint="#E0F2F1"
             app:icon="@drawable/ic_baseline_search_24px"
             app:iconTint="#000" />
 
@@ -53,12 +54,13 @@
             android:layout_marginLeft="80dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="80dp"
-            android:background="@color/colorAccent"
+            android:background="#E0F2F1"
             android:fontFamily="@font/open_sans_bold"
             android:padding="15dp"
             android:text="People Information"
             android:textColor="#000"
             android:textSize="15sp"
+            app:backgroundTint="#E0F2F1"
             app:icon="@drawable/ic_outline_place_24px"
             app:iconTint="#000" />
 
@@ -69,12 +71,13 @@
             android:layout_marginLeft="80dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="80dp"
-            android:background="@color/colorAccent"
+            android:background="@color/colorButton"
             android:fontFamily="@font/open_sans_bold"
             android:padding="15dp"
             android:text="Interactive Equipment"
             android:textColor="#000"
             android:textSize="15sp"
+            app:backgroundTint="#E0F2F1"
             app:icon="@drawable/ic_outline_label_24px"
             app:iconTint="#000" />
 
@@ -85,12 +88,13 @@
             android:layout_marginLeft="80dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="80dp"
-            android:background="@color/colorAccent"
+            android:background="#E0F2F1"
             android:fontFamily="@font/open_sans_bold"
             android:padding="15dp"
             android:text="Logout"
             android:textColor="#000"
             android:textSize="15sp"
+            app:backgroundTint="#E0F2F1"
             app:icon="@drawable/ic_outline_exit_to_app_24px"
             app:iconTint="#000" />
 </LinearLayout>
