@@ -129,7 +129,6 @@ public class QuizDbHelper extends SQLiteOpenHelper {
 
     public void addCorectAnswers(int categoryID, int correctAnswers){
         db = getReadableDatabase();
-
         String[] selectionArgs = new String[]{Integer.toString(categoryID)};
 
         Cursor c = db.rawQuery("SELECT * FROM " + QuizTrackerTable.TABLE_NAME +
@@ -138,12 +137,11 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         if(c.moveToFirst()){
             do {
                 int totalQuestions = c.getColumnIndex(QuizTrackerTable.TOTAL_QUESTIONS);
-                if(totalQuestions == correctAnswers){
-                    ContentValues values = new ContentValues();
-                    values.put(QuizTrackerTable.ANSWERED_CORRECTLY, correctAnswers);
 
-                    db.update(QuizTrackerTable.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(categoryID)});
-                }
+                ContentValues values = new ContentValues();
+                values.put(QuizTrackerTable.ANSWERED_CORRECTLY, correctAnswers);
+
+                db.update(QuizTrackerTable.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(categoryID)});
 
             } while (c.moveToNext());
 

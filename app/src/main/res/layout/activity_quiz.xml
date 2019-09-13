@@ -30,16 +30,6 @@
         android:freezesText="true"
         android:text="Category: "
         android:textColor="@android:color/black" />
-
-    <TextView
-        android:id="@+id/text_view_countdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:text="00:30"
-        android:textColor="@android:color/black"
-        android:textSize="40sp" />
-
     <TextView
         android:id="@+id/text_view_question"
         android:layout_width="match_parent"

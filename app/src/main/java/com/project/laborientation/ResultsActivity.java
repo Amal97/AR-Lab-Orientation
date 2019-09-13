@@ -31,5 +31,11 @@ public class ResultsActivity extends Activity {
         mAdapter = new ResultsAdapter(QuizDbHelper.getInstance(this).getCategoryScores());
         recyclerView.setAdapter(mAdapter);
     }
-    // ...
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter = new ResultsAdapter(QuizDbHelper.getInstance(this).getCategoryScores());
+        recyclerView.setAdapter(mAdapter);
+    }    // ...
 }

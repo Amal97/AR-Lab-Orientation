@@ -1,12 +1,15 @@
 package com.project.laborientation;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Camera;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -64,7 +67,6 @@ public class QuizActivity extends AppCompatActivity {
         textViewScore = findViewById(R.id.text_view_score);
         textViewQuestionCount = findViewById(R.id.text_view_question_count);
         textViewCategory = findViewById(R.id.text_view_category);
-        textViewCountDown = findViewById(R.id.text_view_countdown);
         rbGroup = findViewById(R.id.radio_group);
         rb1 = findViewById(R.id.radio_button1);
         rb2 = findViewById(R.id.radio_button2);
@@ -140,8 +142,22 @@ public class QuizActivity extends AppCompatActivity {
             for (Category data: mDataset) {
                 correctAnswers = correctAnswers + data.getScore();
             }
-            finishQuiz();
+            if (correctAnswers == 12) {
+                displayComplete();
+            } else {
+                finishQuiz();
+            }
         }
+    }
+
+    public void displayComplete(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("You have completed the orientation! Congratulations")
+                .setTitle("Orientation Complete");
+
+        builder.setPositiveButton("Close", (dialog, id) -> finish());
+        builder.show();
     }
 
     private void checkAnswer(){
@@ -188,10 +204,6 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void finishQuiz(){
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_SCORE, score);
-        setResult(RESULT_OK, resultIntent);
-
         finish();
     }
 
