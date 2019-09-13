@@ -80,7 +80,8 @@ public class OptionsDialog extends DialogFragment {
         Intent myIntent = new Intent(getActivity(), QuizActivity.class);
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
-        startActivityForResult(myIntent, 1);
+        Log.e("OptionsDialog", categoryName);
+        startActivity(myIntent);
     }
 
     private void startVideo() {

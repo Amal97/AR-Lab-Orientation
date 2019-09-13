@@ -221,7 +221,8 @@ public class CameraActivity extends AppCompatActivity
             startActivity(mainIntent);
             finish();
         } else if (id == R.id.nav_status) {
-
+            Intent resultsIntent = new Intent(getBaseContext(), ResultsActivity.class);
+            startActivity(resultsIntent);
         } else if (id == R.id.logout) {
             LoginManager.getInstance().logOut();
             Intent loginIntent = new Intent(getBaseContext(), LoginActivity.class);

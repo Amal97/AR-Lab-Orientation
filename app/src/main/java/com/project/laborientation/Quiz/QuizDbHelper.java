@@ -127,7 +127,6 @@ public class QuizDbHelper extends SQLiteOpenHelper {
 
     public void addCorectAnswers(int categoryID, int correctAnswers){
         db = getReadableDatabase();
-
         String[] selectionArgs = new String[]{Integer.toString(categoryID)};
 
         Cursor c = db.rawQuery("SELECT * FROM " + QuizTrackerTable.TABLE_NAME +
@@ -136,12 +135,11 @@ public class QuizDbHelper extends SQLiteOpenHelper {
         if(c.moveToFirst()){
             do {
                 int totalQuestions = c.getColumnIndex(QuizTrackerTable.TOTAL_QUESTIONS);
-                if(totalQuestions == correctAnswers){
-                    ContentValues values = new ContentValues();
-                    values.put(QuizTrackerTable.ANSWERED_CORRECTLY, correctAnswers);
 
-                    db.update(QuizTrackerTable.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(categoryID)});
-                }
+                ContentValues values = new ContentValues();
+                values.put(QuizTrackerTable.ANSWERED_CORRECTLY, correctAnswers);
+
+                db.update(QuizTrackerTable.TABLE_NAME, values, "_id = ?", new String[] {Integer.toString(categoryID)});
 
             } while (c.moveToNext());
 
@@ -279,8 +277,29 @@ public class QuizDbHelper extends SQLiteOpenHelper {
                 categoryList.add(category);
             } while(c.moveToNext());
         }
+
         c.close();
         return categoryList;
+    }
+
+    public List<Category> getCategoryScores() {
+        List<Category> categoryList = new ArrayList<>();
+        db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM quiz_completed", null);
+
+        if(c.moveToFirst()){
+            do{
+                Category category = new Category();
+                category.setId(c.getInt(c.getColumnIndex(CategoriesTable._ID)));
+                category.setName(c.getString(c.getColumnIndex(CategoriesTable.COLUMN_NAME)));
+                category.setScore(c.getInt(c.getColumnIndex("correct_answers")));
+                categoryList.add(category);
+            } while(c.moveToNext());
+        }
+
+        c.close();
+        return categoryList;
+
     }
 
     public ArrayList<Question> getQuestions(int categoryID){
