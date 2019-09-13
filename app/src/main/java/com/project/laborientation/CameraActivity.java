@@ -172,7 +172,10 @@ public class CameraActivity extends AppCompatActivity
             }
         });
 
+
+
         builder.show();
+
     }
 
 
@@ -569,7 +572,6 @@ public class CameraActivity extends AppCompatActivity
         DialogFragment optionFragment = new OptionsDialog();
         optionFragment.setArguments(bundle);
         optionFragment.show(getSupportFragmentManager(), "optionsDialog");
-
     }
 
 

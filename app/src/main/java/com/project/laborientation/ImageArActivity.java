@@ -97,7 +97,7 @@ import java.util.concurrent.CompletableFuture;
             setContentView(R.layout.activity_image_ar);
 
             displayTutorial();
-            
+
             arFragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
             arFragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
