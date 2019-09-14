@@ -57,12 +57,12 @@ dependencies {
     implementation files('libs/YouTubeAndroidPlayerApi.jar')
 
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
-    implementation 'com.google.firebase:firebase-database:19.0.0'
+    implementation 'com.google.firebase:firebase-database:19.1.0'
     implementation 'com.firebase:firebase-client-android:2.3.1'
     implementation 'org.tensorflow:tensorflow-android:1.13.1'
     testImplementation 'junit:junit:4.12'
 
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.11.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.12.0'
 
     implementation 'com.github.barteksc:android-pdf-viewer:2.3.0'
 }

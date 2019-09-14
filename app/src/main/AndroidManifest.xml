@@ -23,7 +23,8 @@
         android:roundIcon="@drawable/multimeter"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Rules"></activity>
+        <activity android:name=".PdfActivity"></activity>
+        <activity android:name=".Rules" />
         <activity android:name=".FindLecturer_text_input" />
 
         <meta-data

@@ -11,6 +11,7 @@ import android.graphics.Camera;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.github.barteksc.pdfviewer.PDFView;
 import com.project.laborientation.CameraActivity;
 import com.project.laborientation.Quiz.Category;
 import com.project.laborientation.Quiz.QuizDbHelper;
@@ -40,6 +41,8 @@ public class OptionsDialog extends DialogFragment {
                             startVideo();
                         } else if (which == 1) {
                             startQuiz();
+                        } else if (which == 2) {
+                            startPdf();
                         } else {
                             startInteractive();
                         }
@@ -95,6 +98,30 @@ public class OptionsDialog extends DialogFragment {
         Intent myIntent = new Intent(getActivity(), InteractiveActivity.class);
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_ID, categoryID);
         myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, categoryName);
+        startActivity(myIntent);
+    }
+
+    private void startPdf() {
+        switch (object) {
+            case "oscilloscope":
+                openPDF("oscilloscope.pdf");
+                break;
+            case "powersupply":
+                openPDF("power_supply.pdf");
+                break;
+            case "waveformgenerator":
+                openPDF("waveform_generator.pdf");
+                break;
+            case "multimeter":
+                openPDF("multimeter.pdf");
+                break;
+        }
+    }
+
+    // Create an alert box option and in that copy this code
+    private void openPDF(String file){
+        Intent myIntent = new Intent(getActivity(), PdfActivity.class);
+        myIntent.putExtra(CameraActivity.EXTRA_CATEGORY_Name, file);
         startActivity(myIntent);
     }
 
