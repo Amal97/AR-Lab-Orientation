@@ -98,6 +98,7 @@ public class Rules extends AppCompatActivity
 
 
     private WebView webView;
+    private PDFView pdfView;
     Button takePictureButton;
 
     @Override
@@ -165,12 +166,7 @@ public class Rules extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -513,7 +509,7 @@ public class Rules extends AppCompatActivity
     // Create an alert box option and in that copy this code
     private void openPDF(){
         setContentView(R.layout.pdfviewer);
-        PDFView pdfView = (PDFView)findViewById(R.id.pdfView);
+        pdfView = (PDFView)findViewById(R.id.pdfView);
         // in the dir "src/main/assets/" put the pdf file and change the name below
         pdfView.fromAsset("lab.pdf").load();
     }
