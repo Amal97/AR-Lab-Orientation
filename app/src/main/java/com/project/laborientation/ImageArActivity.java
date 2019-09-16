@@ -90,6 +90,9 @@ import java.util.concurrent.CompletableFuture;
         private Handler handler;
         private HandlerThread handlerThread;
 
+        Button takePictureButton;
+
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +100,10 @@ import java.util.concurrent.CompletableFuture;
             setContentView(R.layout.activity_image_ar);
 
             displayTutorial();
+
+            takePictureButton = findViewById(R.id.btn_takepicture);
+            takePictureButton.setVisibility(View.INVISIBLE);
+
 
             arFragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.arFragment);
             arFragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
