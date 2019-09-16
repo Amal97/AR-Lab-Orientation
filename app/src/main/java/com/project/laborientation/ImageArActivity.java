@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -109,12 +110,18 @@ import java.util.concurrent.CompletableFuture;
             arFragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             classifier = new MSCognitiveServicesClassifier(ImageArActivity.this);
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int width = metrics.widthPixels;
+            int height = metrics.heightPixels;
+
             try {
                 cameraId = manager.getCameraIdList()[0];
                 CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
                 StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
-                final Size inputSize = new Size(640, 480);
+                final Size inputSize = new Size(width, height);
                 Size previewSize =
                         chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                                 inputSize.getWidth(),

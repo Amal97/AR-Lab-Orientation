@@ -26,6 +26,7 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.Profile;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.util.Size;
@@ -292,8 +293,13 @@ public class FindLecturersActivity extends AppCompatActivity
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             }
-            int width = 640;
-            int height = 480;
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int width = metrics.widthPixels;
+            int height = metrics.heightPixels;
+//            int width = 640;
+//            int height = 480;
             if (jpegSizes != null && 0 < jpegSizes.length) {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();

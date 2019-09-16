@@ -27,6 +27,7 @@ import com.facebook.Profile;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.util.Size;
@@ -440,8 +441,14 @@ public class CameraActivity extends AppCompatActivity
                 ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
-            width = 640;
-            height = 480;
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            width = metrics.widthPixels;
+            height = metrics.heightPixels;
+
+//            width = 640;
+//            height = 480;
 
             final Size inputSize = new Size(width, height);
             Size previewSize =
