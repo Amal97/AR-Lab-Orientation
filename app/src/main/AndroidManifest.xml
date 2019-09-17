@@ -55,6 +55,9 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".FindLecturersActivity" />
+        <activity android:name=".ResultsActivity" />
+        <activity android:name=".PdfActivity"/>
+
         <activity android:name=".QuizActivity" />
         <activity android:name=".VideoActivity" />
         <activity
