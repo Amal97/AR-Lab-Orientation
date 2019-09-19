@@ -111,10 +111,13 @@ import java.util.concurrent.CompletableFuture;
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             classifier = new MSCognitiveServicesClassifier(ImageArActivity.this);
 
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int width = metrics.widthPixels;
-            int height = metrics.heightPixels;
+//            DisplayMetrics metrics = new DisplayMetrics();
+//            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//            int width = metrics.widthPixels;
+//            int height = metrics.heightPixels;
+
+            int width = 640;
+            int height = 480;
 
             try {
                 cameraId = manager.getCameraIdList()[0];

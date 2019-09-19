@@ -501,15 +501,20 @@ public class Rules extends AppCompatActivity
 
 
     private void processText(FirebaseVisionText text) {
-        List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
-        if (blocks.size() == 0) {
-            return;
-        }
-        for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
-            String txt = block.getText();
-            if(txt.contains("Rules")) {
-                openPDF();
+        try {
+            List<FirebaseVisionText.TextBlock> blocks = text.getTextBlocks();
+            if (blocks.size() == 0) {
+                return;
             }
+            for (FirebaseVisionText.TextBlock block : text.getTextBlocks()) {
+                String txt = block.getText();
+                if (txt.contains("Rules")) {
+                    openPDF();
+                }
+            }
+        }
+        catch(Exception e){
+            Log.e(TAG, e.getMessage());
         }
     }
 
