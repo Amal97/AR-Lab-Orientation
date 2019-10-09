@@ -239,6 +239,30 @@ import java.util.concurrent.CompletableFuture;
                                                 .build()
                                                 .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
                                     }
+                                    else if(r.getTitle().equals("monitor")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.monitor_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                    else if(r.getTitle().equals("printer")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.printer_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                    else if(r.getTitle().equals("solder")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.solder_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
+                                    else if(r.getTitle().equals("socket")){
+                                        ViewRenderable.builder()
+                                                .setView(this, R.layout.power_socket_view)
+                                                .build()
+                                                .thenAccept(viewRenderable -> placeModel(viewRenderable, anchor)).exceptionally(throwable -> null);
+                                    }
                                 }));
                             }
                             computing = false;

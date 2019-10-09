@@ -369,7 +369,15 @@ public class CameraActivity extends AppCompatActivity
 
                     Classifier.Recognition r = classifier.classifyImage(rgbFrameBitmap, getOrientation());
                     if (r.getConfidence() > 0.7) {
-                        openDialog(r.getTitle());
+                        if(r.getTitle().equals("multimeter") || r.getTitle().equals("oscilloscope") || r.getTitle().equals("powersupply") || r.getTitle().equals("waveformgenerator")) {
+                            openDialog(r.getTitle());
+                        }
+                        else if( r.getTitle().equals("socket")){
+                            Toast.makeText(this, "230/240 volts (50 hertz)", Toast.LENGTH_LONG).show();
+                        }
+                        else{
+                            Toast.makeText(this, r.getTitle(), Toast.LENGTH_LONG).show();
+                        }
                         computing = false;
                     }
                 } catch (final Exception e) {
