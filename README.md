@@ -1,7 +1,7 @@
 # AR-Lab-Orientation
 
 ## To run:
-### Requirement: 
+### Requirements: 
 * An Android smartphone with Android 7.0 (API level 24) or above
 * Latest version of Google Play Store
 * Latest version of ARCore
@@ -11,7 +11,7 @@
 3. Make sure the application have permission to use the camera.
 
 ## To develop: 
-### Requirement: 
+### Requirements: 
 * Android Studio
 * Smartphone/Emulator
 
