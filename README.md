@@ -34,5 +34,5 @@ The `QuizActivity` handles the application’s quiz activity. The activity handl
 * Go to `Quiz -> QuizDbHelper`
 * In the `fillQuestionsTable` function create a new Question object, where the first parameter of Question is the actual question. Followed by three parameters, which are the multiple-choice answers, the fifth parameter is the answer and the sixth parameter is the category id.
 * Then pass it to the “addQuestion” function
-** `Eg. Question q1 = new Question(“Question”, “Ans1”, “Ans2”, “Ans3”, 2, Category.WAVEFORM_GENERATOR); `
-** `addQuestion(q1);`
+  * `Eg. Question q1 = new Question(“Question”, “Ans1”, “Ans2”, “Ans3”, 2, Category.WAVEFORM_GENERATOR); `
+  * `addQuestion(q1);`
